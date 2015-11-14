@@ -99,48 +99,61 @@ echo
 }
 
 
-function compileat91bootstrap {
+function compilebootloader {
 echo
 echo
-echo "Compilation of at91 bootstrap"
+echo "Compilation of bootloader"
 echo
 echo
 sleep 1
 
 if [ $BOARD -eq $ACQUA256 ]; then
 	echo
-	#cd at91bootstrap-3.7-acqua-256m
-	#make acqua-256m_defconfig
+	cd at91bootstrap-3.7-acqua-256m
+	make acqua-256m_defconfig
 elif [ $BOARD -eq $ACQUA512 ]; then
 	echo
-	#cd at91bootstrap-3.7-acqua-512m
-	#make acqua-512m_defconfig
+	cd at91bootstrap-3.7-acqua-512m
+	make acqua-512m_defconfig
 elif [ $BOARD -eq $ARIAG25128 ]; then
 	echo
-	#cd at91bootstrap-3.7-aria-128m
-	#make aria-128m_defconfig
+	cd at91bootstrap-3.7-aria-128m
+	make aria-128m_defconfig
 elif [ $BOARD -eq $ARIAG25256 ]; then
 	echo
-	#cd at91bootstrap-3.7-aria-256m
-	#make aria-256m_defconfig
+	cd at91bootstrap-3.7-aria-256m
+	make aria-256m_defconfig
 elif [ $BOARD -eq $ARIETTAG25128 ]; then
 	echo
-	#cd at91bootstrap-3.7-arietta-128m
-	#make arietta-128m_defconfig
+	cd at91bootstrap-3.7-arietta-128m
+	make arietta-128m_defconfig
 elif [ $BOARD -eq $ARIETTAG25256 ]; then
 	echo
-	#cd at91bootstrap-3.7-arietta-256m
-	#make arietta-256m_defconfig
+	cd at91bootstrap-3.7-arietta-256m
+	make arietta-256m_defconfig
 elif [ $BOARD -eq $FOX ]; then
 	echo
 
 else
 	wrong
 fi
-#for all but not for FOX
-#make menuconfig
-#make CROSS_COMPILE=arm-linux-gnueabi-
-#cd ..
+
+if [ $BOARD -eq $ARIAG25128 ] && [ $KERNEL -eq $K2_6_39 ]; then
+	# http://www.acmesystems.it/ariaboot
+	echo
+elif [ $BOARD -eq $ARIAG25256 ] && [ $KERNEL -eq $K2_6_39 ]; then
+	# http://www.acmesystems.it/ariaboot
+	echo
+elif [ $BOARD -eq $FOX ] && [ $KERNEL -eq $K2_6_38 ]; then
+	# http://www.acmesystems.it/acmeboot
+	echo
+else
+	#for all other
+	make menuconfig
+	make CROSS_COMPILE=arm-linux-gnueabi-
+fi
+cd ..
+
 }
 
 function theend {
@@ -201,12 +214,12 @@ function copyfiles {
 	echo
 	echo
 	read KEY
-	copyat91bootstrap
+	copybootloader
 	copyroofts
 	copykernel
 }
 
-function copyat91bootstrap {
+function copybootloader {
 	echo
 	echo
 	echo "Copy of bootloader on micro sd"
@@ -305,7 +318,7 @@ function umountmemory {
 #
 menuboard
 menukernel
-compileat91bootstrap
+compilebootloader
 compilekernel
 copyfiles
 umountmemory
