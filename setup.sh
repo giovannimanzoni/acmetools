@@ -7,6 +7,8 @@
 # Licensed under GPLv2 or later.
 #
 
+LOG_FILE='setup.log'
+
 function addtogit {
 git init
 git add .
@@ -31,13 +33,14 @@ echo
 echo "insert root password"
 sudo chroot target-rootfs passwd
 # sudo rm target-rootfs/usr/bin/qemu-arm-static
+sudo umount target-rootfs/dev/
 }
 
-
+function menu {
 echo "First setup"
 echo
 echo "- validate requirement"
-echo "- setup package from apt-get"
+echo "- setup packages from apt-get"
 echo "- setup at91bootstrap"
 echo "- setup rootfs"
 echo "- setup kernel"
@@ -47,9 +50,9 @@ echo
 echo "P R E S S     E N T E R"
 echo
 read KEY
+}
 
-LOG_FILE='setup.log'
-
+function validate {
 #only ubuntu - to be do
 #cat /etc/issue
 touch $LOG_FILE
@@ -58,6 +61,10 @@ echo "S T A R T" >> $LOG_FILE
 NOW=$(date)
 echo "$NOW" >> $LOG_FILE
 
+#validate - to be do
+}
+
+function setuppackages {
 # setup package
 echo "setup package from apt-get"
 echo
@@ -69,7 +76,9 @@ read KEY
 echo "setup package" >> $LOG_FILE
 sudo apt-get update
 sudo apt-get install libc6-armel-cross libc6-dev-armel-cross binutils-arm-linux-gnueabi libncurses5-dev gcc-arm-linux-gnueabi g++-arm-linux-gnueabi gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf gparted git multistrap qemu qemu-user-static binfmt-support dpkg-cross beep
+}
 
+function setupbootloader {
 #bootloader
 #only if ubuntu <=14
 # cat /etc/issue - to be do
@@ -89,7 +98,9 @@ cp -R at91bootstrap-3.7 at91bootstrap-3.7-aria-128m
 cp -R at91bootstrap-3.7 at91bootstrap-3.7-aria-256m
 cp -R at91bootstrap-3.7 at91bootstrap-3.7-arietta-128m
 mv    at91bootstrap-3.7 at91bootstrap-3.7-arietta-256m
+}
 
+function setupkernel {
 #kernel
 cd ..
 echo "setup kernel" >> $LOG_FILE
@@ -188,13 +199,13 @@ cd foxg20-linux-2.6.38
 addtogit
 make foxg20_defconfig
 cd ..
-
-#rootfs
+# exit from rootfs folder
 cd ..
+}
+
+function setuprootfswheezy {
 echo "setup rootfs" >> $LOG_FILE
-mkdir rootfs
 cd rootfs
-#wheezy
 echo "setup rootfs Wheezy" >> ../$LOG_FILE
 mkdir multistrap_debian_wheezy
 cd multistrap_debian_wheezy
@@ -210,7 +221,6 @@ chmod +x aria.sh
 sudo ./aria.sh
 rootfsend
 cd ..
-
 
 echo "setup rootfs Wheezy for AriettaG25" >> ../../$LOG_FILE
 mkdir arietta
@@ -238,13 +248,29 @@ sudo ./acqua.sh
 rootfsend
 cd ..
 
-#exit from wheezy
+#exit from multistrap wheezy
 cd ..
+#exit from rootfs
+cd ..
+}
 
-#jessie
+function setuprootfsjessie {
 echo "setup rootfs Jessie" >> ../$LOG_FILE
+cd rootfs
 mkdir multistrap_debian_jessie
 cd multistrap_debian_jessie
+
+echo "setup rootfs Jessie for Acqua" >> ../../$LOG_FILE
+mkdir acqua
+cd acqua
+wget http://www.acmesystems.it/www/debian_jessie/multistrap_acqua.conf
+sudo multistrap -a armel -f multistrap_acqua.conf
+rootfscommon
+wget http://www.acmesystems.it/www/debian_jessie/acqua.sh
+chmod +x acqua.sh
+sudo ./acqua.sh
+rootfsend
+cd ..
 
 echo "setup rootfs Jessie for AriaG25" >> ../../$LOG_FILE
 mkdir aria
@@ -258,10 +284,9 @@ sudo ./aria.sh
 rootfsend
 cd ..
 
-
 echo "setup rootfs Jessie for AriettaG25" >> ../../$LOG_FILE
-mkdir aria
-cd aria
+mkdir arietta
+cd arietta
 wget http://www.acmesystems.it/www/debian_jessie/multistrap_arietta.conf
 sudo multistrap -a armel -f multistrap_arietta.conf
 rootfscommon
@@ -271,10 +296,9 @@ sudo ./arietta.sh
 rootfsend
 cd ..
 
-
 echo "setup rootfs Jessie for FoxG20" >> ../../$LOG_FILE
-mkdir aria
-cd aria
+mkdir fox
+cd fox
 wget http://www.acmesystems.it/www/debian_jessie/multistrap_fox.conf
 sudo multistrap -a armel -f multistrap_fox.conf
 rootfscommon
@@ -284,12 +308,29 @@ sudo ./fox.sh
 rootfsend
 cd ..
 
-
+#exit from multistrap wheezy
+cd ..
 #exit from rootfs
 cd ..
-#end
+}
+
+
+function theend {
 echo "The End" >> $LOG_FILE
 echo
 echo "The End"
 echo
+}
+
+menu
+#validate
+#setuppackages
+mkdir bootloader
+mkdir kernel
+mkdir rootfs
+#setupbootloader
+#setupkernel
+#setuprootfswheezy
+setuprootfsjessie
+theend
 
