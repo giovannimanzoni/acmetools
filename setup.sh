@@ -22,7 +22,7 @@ sudo cp /usr/bin/qemu-arm-static target-rootfs/usr/bin
 sudo mount -o bind /dev/ target-rootfs/dev/
 echo
 beep
-echo "choose 'No' when ask configuring dash. press Enter"
+echo "Choose 'No' when ask configuring dash. press Enter"
 echo
 read
 sudo LC_ALL=C LANGUAGE=C LANG=C chroot target-rootfs dpkg --configure -a
@@ -30,7 +30,8 @@ sudo LC_ALL=C LANGUAGE=C LANG=C chroot target-rootfs dpkg --configure -a
 
 function rootfsend {
 echo
-echo "insert root password"
+echo ">>>> Insert root password FOR TARGET BOARD<<<<"
+echo
 sudo chroot target-rootfs passwd
 # sudo rm target-rootfs/usr/bin/qemu-arm-static
 sudo umount target-rootfs/dev/
@@ -80,12 +81,12 @@ echo "2/5: Setup package from apt-get"
 echo "-------------------------------------"
 echo
 echo
-echo "if apt-get fail, your repositories are old !! you have to setup old-releases repo, look at http://wiki.ubuntu-it.org/Repository/SourcesList/EOL"
+echo "If apt-get fail, your repositories are old !! you have to setup old-releases repo, look at http://wiki.ubuntu-it.org/Repository/SourcesList/EOL"
 echo
-echo "press Enter"
+echo "Press Enter"
 echo
 read KEY
-echo "setup package" >> $LOG_FILE
+echo "Setup package" >> $LOG_FILE
 sudo apt-get update
 sudo apt-get install libc6-armel-cross libc6-dev-armel-cross binutils-arm-linux-gnueabi libncurses5-dev gcc-arm-linux-gnueabi g++-arm-linux-gnueabi gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf gparted git multistrap qemu qemu-user-static binfmt-support dpkg-cross beep
 }
@@ -100,7 +101,7 @@ echo "3/5: Setup bootloader"
 echo "-------------------------------------"
 echo
 echo
-echo "setup bootloader" >> $LOG_FILE
+echo "Setup bootloader" >> $LOG_FILE
 mkdir bootloader
 cd bootloader
 #at91bootsrap
@@ -127,8 +128,7 @@ echo "4/5: Setup kernel"
 echo "-------------------------------------"
 echo
 echo
-echo "setup kernel" >> $LOG_FILE
-mkdir kernel
+echo "Setup kernel" >> $LOG_FILE
 cd kernel
 #4.2.6
 echo
@@ -136,7 +136,7 @@ echo
 echo "S E T U P   K E R N E L   4 . 2 . 6"
 echo
 echo
-echo "setup kernel 4.2.6" >> ../$LOG_FILE
+echo "Setup kernel 4.2.6" >> ../$LOG_FILE
 wget https://www.kernel.org/pub/linux/kernel/v4.x/linux-4.2.6.tar.xz
 tar xvfJ linux-4.2.6.tar.xz
 cd linux-4.2.6
@@ -150,7 +150,7 @@ echo
 echo "S E T U P   K E R N E L   4 . 1 . 1 1"
 echo
 echo
-echo "setup kernel 4.1.11" >> ../$LOG_FILE
+echo "Setup kernel 4.1.11" >> ../$LOG_FILE
 wget https://www.kernel.org/pub/linux/kernel/v4.x/linux-4.1.11.tar.xz
 tar xvfJ linux-4.1.11.tar.xz
 cd linux-4.1.11
@@ -164,7 +164,7 @@ echo
 echo "S E T U P   K E R N E L   3 . 1 8 . 1 4"
 echo
 echo
-echo "setup kernel 3.18.14" >> ../$LOG_FILE
+echo "Setup kernel 3.18.14" >> ../$LOG_FILE
 wget https://www.kernel.org/pub/linux/kernel/v3.x/linux-3.18.14.tar.xz
 tar xvfJ linux-3.18.14.tar.xz
 cd linux-3.18.14
@@ -183,7 +183,7 @@ echo
 echo "S E T U P   K E R N E L   3 . 1 6 . 1"
 echo
 echo
-echo "setup kernel 3.16.1" >> ../$LOG_FILE
+echo "Setup kernel 3.16.1" >> ../$LOG_FILE
 wget https://www.kernel.org/pub/linux/kernel/v3.x/linux-3.16.1.tar.xz
 tar xvfJ linux-3.16.1.tar.xz
 cd linux-3.16.1
@@ -202,7 +202,7 @@ echo
 echo "S E T U P   K E R N E L   3 . 1 4 . 2 3"
 echo
 echo
-echo "setup kernel 3.14.23" >> ../$LOG_FILE
+echo "Setup kernel 3.14.23" >> ../$LOG_FILE
 wget https://www.kernel.org/pub/linux/kernel/v3.x/linux-3.14.23.tar.xz
 tar xvfJ linux-3.14.23.tar.xz
 cd linux-3.14.23
@@ -218,7 +218,7 @@ echo
 echo "S E T U P   K E R N E L   3 . 1 0"
 echo
 echo
-echo "setup kernel 3.10" >> ../$LOG_FILE
+echo "Setup kernel 3.10" >> ../$LOG_FILE
 wget https://github.com/linux4sam/linux-at91/archive/linux-3.10-at91.zip
 unzip linux-3.10-at91.zip
 mv linux-at91-linux-3.10-at91 linux-3.10-acqua
@@ -240,7 +240,7 @@ echo
 echo "S E T U P   K E R N E L   2 . 6 . 3 9"
 echo
 echo
-echo "setup kernel 2.6.39" >> ../$LOG_FILE
+echo "Setup kernel 2.6.39" >> ../$LOG_FILE
 wget http://www.kernel.org/pub/linux/kernel/v2.6/linux-2.6.39.tar.bz2
 tar -xvjf linux-2.6.39.tar.bz2
 cd linux-2.6.39
@@ -257,7 +257,7 @@ echo
 echo "S E T U P   K E R N E L   2 . 6 . 3 8"
 echo
 echo
-echo "setup kernel 2.6.38" >> ../$LOG_FILE
+echo "Setup kernel 2.6.38" >> ../$LOG_FILE
 git clone git://github.com/tanzilli/foxg20-linux-2.6.38.git
 cd foxg20-linux-2.6.38
 addtogit
@@ -268,9 +268,9 @@ cd ..
 }
 
 function setuprootfswheezy {
-echo "setup rootfs Wheezy" >> $LOG_FILE
+echo "Setup rootfs Wheezy" >> $LOG_FILE
 cd rootfs
-echo "setup rootfs Wheezy" >> ../$LOG_FILE
+echo "Setup rootfs Wheezy" >> ../$LOG_FILE
 mkdir multistrap_debian_wheezy
 cd multistrap_debian_wheezy
 
@@ -279,7 +279,7 @@ echo
 echo "S E T U P   W H E E Z Y   R O O T F S   F O R   A R I A   G 2 5"
 echo
 echo
-echo "setup rootfs Wheezy for AriaG25" >> ../../$LOG_FILE
+echo "Setup rootfs Wheezy for AriaG25" >> ../../$LOG_FILE
 mkdir aria
 cd aria
 wget http://www.acmesystems.it/www/debian_wheezy/multistrap_aria.conf
@@ -296,7 +296,7 @@ echo
 echo "S E T U P   W H E E Z Y   R O O T F S   F O R   A R I E T T A   G 2 5"
 echo
 echo
-echo "setup rootfs Wheezy for AriettaG25" >> ../../$LOG_FILE
+echo "Setup rootfs Wheezy for AriettaG25" >> ../../$LOG_FILE
 mkdir arietta
 cd arietta
 wget http://www.acmesystems.it/www/debian_wheezy/multistrap_arietta.conf
@@ -315,7 +315,7 @@ echo
 echo "S E T U P   W H E E Z Y   R O O T F S   F O R   A C Q U A"
 echo
 echo
-echo "setup rootfs Wheezy for Acqua" >> ../../$LOG_FILE
+echo "Setup rootfs Wheezy for Acqua" >> ../../$LOG_FILE
 mkdir acqua
 cd acqua
 wget http://www.acmesystems.it/www/debian_wheezy/multistrap_acqua.conf
@@ -334,7 +334,7 @@ cd ..
 }
 
 function setuprootfsjessie {
-echo "setup rootfs Jessie" >> ../$LOG_FILE
+echo "Setup rootfs Jessie" >> ../$LOG_FILE
 cd rootfs
 mkdir multistrap_debian_jessie
 cd multistrap_debian_jessie
@@ -344,7 +344,7 @@ echo
 echo "S E T U P   J E S S I E   R O O T F S   F O R   A C Q U A"
 echo
 echo
-echo "setup rootfs Jessie for Acqua" >> ../../$LOG_FILE
+echo "Setup rootfs Jessie for Acqua" >> ../../$LOG_FILE
 mkdir acqua
 cd acqua
 wget http://www.acmesystems.it/www/debian_jessie/multistrap_acqua.conf
@@ -361,7 +361,7 @@ echo
 echo "S E T U P   J E S S I E   R O O T F S   F O R   A R I A   G 2 5"
 echo
 echo
-echo "setup rootfs Jessie for AriaG25" >> ../../$LOG_FILE
+echo "Setup rootfs Jessie for AriaG25" >> ../../$LOG_FILE
 mkdir aria
 cd aria
 wget http://www.acmesystems.it/www/debian_jessie/multistrap_aria.conf
@@ -378,7 +378,7 @@ echo
 echo "S E T U P   J E S S I E   R O O T F S   F O R   A R I E T T A   G 2 5"
 echo
 echo
-echo "setup rootfs Jessie for AriettaG25" >> ../../$LOG_FILEecho
+echo "Setup rootfs Jessie for AriettaG25" >> ../../$LOG_FILEecho
 mkdir arietta
 cd arietta
 wget http://www.acmesystems.it/www/debian_jessie/multistrap_arietta.conf
@@ -395,7 +395,7 @@ echo
 echo "S E T U P   J E S S I E   R O O T F S   F O R   F O X   G 2 0"
 echo
 echo
-echo "setup rootfs Jessie for FoxG20" >> ../../$LOG_FILE
+echo "Setup rootfs Jessie for FoxG20" >> ../../$LOG_FILE
 mkdir fox
 cd fox
 wget http://www.acmesystems.it/www/debian_jessie/multistrap_fox.conf
