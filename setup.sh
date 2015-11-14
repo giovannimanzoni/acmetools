@@ -22,6 +22,12 @@ sudo cp /usr/bin/qemu-arm-static target-rootfs/usr/bin
 sudo mount -o bind /dev/ target-rootfs/dev/
 echo
 beep
+echo
+echo
+echo "PAY ATENTION TO THE PREVIOUS LINE IF APT-GET FAIL OR NOT TO DOWNLOAD SOME PACKAGE "
+echo "If yes, the rootfs folder is not complete and costruction of rootfs can not continue ! ! ! !"
+echo
+echo
 echo "Choose 'No' when ask configuring dash. press Enter"
 echo
 read
