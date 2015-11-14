@@ -15,6 +15,7 @@ This repo born because the problem is about gcc version:
 - ubuntu 15 can compile/create rootfs and last kernel but can not compile at91bootstrap, it fail
 - ubuntu 15 can compile kernel 3.18.1 but it is not usable on the micro sd !!
 - ubuntu 15 can not compile kernel 3.16.1
+
 So the simple way is to use Ubuntu 14 but what about use old Linux distro ? :(
 and what about the benefit to compile what can be compiled with the last gcc version ?
 and what about forget that some combination of Host os, target rootfs and target kernel do not work together ?? #!!#$&@## Arrrrg !!
