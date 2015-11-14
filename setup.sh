@@ -37,17 +37,19 @@ sudo umount target-rootfs/dev/
 }
 
 function menu {
+echo
+echo
 echo "First setup"
 echo
-echo "- validate requirement"
-echo "- setup packages from apt-get"
-echo "- setup at91bootstrap"
-echo "- setup rootfs"
-echo "- setup kernel"
+echo "1: Validate Host requirement"
+echo "2: Setup packages from apt-get"
+echo "3: Setup at91bootstrap"
+echo "4: Setup rootfs"
+echo "5: Setup kernel"
 echo
 echo "log saved in setup.log"
 echo
-echo "P R E S S     E N T E R"
+echo "P R E S S     E N T E R     T O     S T A R T"
 echo
 read KEY
 }
@@ -55,6 +57,12 @@ read KEY
 function validate {
 #only ubuntu - to be do
 #cat /etc/issue
+echo
+echo
+echo "1/5: Validate Host requirement"
+echo "-------------------------------------"
+echo "To be do"
+echo
 touch $LOG_FILE
 echo "==============================" >> $LOG_FILE
 echo "S T A R T" >> $LOG_FILE
@@ -66,7 +74,11 @@ echo "$NOW" >> $LOG_FILE
 
 function setuppackages {
 # setup package
-echo "setup package from apt-get"
+echo
+echo
+echo "2/5: Setup package from apt-get"
+echo "-------------------------------------"
+echo
 echo
 echo "if apt-get fail, your repositories are old !! you have to setup old-releases repo, look at http://wiki.ubuntu-it.org/Repository/SourcesList/EOL"
 echo
@@ -82,6 +94,12 @@ function setupbootloader {
 #bootloader
 #only if ubuntu <=14
 # cat /etc/issue - to be do
+echo
+echo
+echo "3/5: Setup bootloader"
+echo "-------------------------------------"
+echo
+echo
 echo "setup bootloader" >> $LOG_FILE
 mkdir bootloader
 cd bootloader
@@ -103,31 +121,52 @@ mv    at91bootstrap-3.7 at91bootstrap-3.7-arietta-256m
 function setupkernel {
 #kernel
 cd ..
+echo
+echo
+echo "4/5: Setup kernel"
+echo "-------------------------------------"
+echo
+echo
 echo "setup kernel" >> $LOG_FILE
 mkdir kernel
 cd kernel
 #4.2.6
+echo
+echo
+echo "S E T U P   K E R N E L   4 . 2 . 6"
+echo
+echo
+echo "setup kernel 4.2.6" >> ../$LOG_FILE
 wget https://www.kernel.org/pub/linux/kernel/v4.x/linux-4.2.6.tar.xz
 tar xvfJ linux-4.2.6.tar.xz
-echo "setup kernel 4.2.6" >> ../$LOG_FILE
 cd linux-4.2.6
 addtogit
 wget https://raw.githubusercontent.com/AcmeSystems/acmepatches/master/linux-4.2.6.patch
 patch -p1 < linux-4.2.6.patch
 cd ..
 #4.1.11
+echo
+echo
+echo "S E T U P   K E R N E L   4 . 1 . 1 1"
+echo
+echo
+echo "setup kernel 4.1.11" >> ../$LOG_FILE
 wget https://www.kernel.org/pub/linux/kernel/v4.x/linux-4.1.11.tar.xz
 tar xvfJ linux-4.1.11.tar.xz
-echo "setup kernel 4.1.11" >> ../$LOG_FILE
 cd linux-4.1.11
 addtogit
 wget https://raw.githubusercontent.com/AcmeSystems/acmepatches/master/linux-4.1.11.patch
 patch -p1 < linux-4.1.11.patch
 cd ..
 #3.18.11
+echo
+echo
+echo "S E T U P   K E R N E L   3 . 1 8 . 1 4"
+echo
+echo
+echo "setup kernel 3.18.14" >> ../$LOG_FILE
 wget https://www.kernel.org/pub/linux/kernel/v3.x/linux-3.18.14.tar.xz
 tar xvfJ linux-3.18.14.tar.xz
-echo "setup kernel 3.18.14" >> ../$LOG_FILE
 cd linux-3.18.14
 addtogit
 wget http://www.acmesystems.it/www/compile_linux_3_18/acme-arietta_defconfig
@@ -139,9 +178,14 @@ wget http://www.acmesystems.it/www/compile_linux_3_18/acme-aria.dts
 mv *.dts arch/arm/boot/dts/
 cd ..
 #3.16.1
+echo
+echo
+echo "S E T U P   K E R N E L   3 . 1 6 . 1"
+echo
+echo
+echo "setup kernel 3.16.1" >> ../$LOG_FILE
 wget https://www.kernel.org/pub/linux/kernel/v3.x/linux-3.16.1.tar.xz
 tar xvfJ linux-3.16.1.tar.xz
-echo "setup kernel 3.16.1" >> ../$LOG_FILE
 cd linux-3.16.1
 addtogit
 wget http://www.acmesystems.it/www/compile_linux_3_16/acme-arietta_defconfig
@@ -153,9 +197,14 @@ wget http://www.acmesystems.it/www/compile_linux_3_16/acme-arietta.dts
 mv *.dts arch/arm/boot/dts/
 cd ..
 #3.14.23
+echo
+echo
+echo "S E T U P   K E R N E L   3 . 1 4 . 2 3"
+echo
+echo
+echo "setup kernel 3.14.23" >> ../$LOG_FILE
 wget https://www.kernel.org/pub/linux/kernel/v3.x/linux-3.14.23.tar.xz
 tar xvfJ linux-3.14.23.tar.xz
-echo "setup kernel 3.14.23" >> ../$LOG_FILE
 cd linux-3.14.23
 addtogit
 wget http://www.acmesystems.it/www/compile_linux_3_14/acme-arietta_defconfig
@@ -164,10 +213,15 @@ wget http://www.acmesystems.it/www/compile_linux_3_14/acme-arietta.dts
 mv *.dts arch/arm/boot/dts/
 cd ..
 #3.10
+echo
+echo
+echo "S E T U P   K E R N E L   3 . 1 0"
+echo
+echo
+echo "setup kernel 3.10" >> ../$LOG_FILE
 wget https://github.com/linux4sam/linux-at91/archive/linux-3.10-at91.zip
 unzip linux-3.10-at91.zip
 mv linux-at91-linux-3.10-at91 linux-3.10-acqua
-echo "setup kernel 3.10" >> ../$LOG_FILE
 cd linux-3.10-acqua
 addtogit
 wget http://www.acmesystems.it/www/compile_linux_3_10_acqua/acme.patch
@@ -181,9 +235,14 @@ wget http://www.acmesystems.it/www/compile_linux_3_10_acqua/acme-acqua_defconfig
 mv acme-acqua_defconfig arch/arm/configs/
 cd ..
 #2.6.39
+echo
+echo
+echo "S E T U P   K E R N E L   2 . 6 . 3 9"
+echo
+echo
+echo "setup kernel 2.6.39" >> ../$LOG_FILE
 wget http://www.kernel.org/pub/linux/kernel/v2.6/linux-2.6.39.tar.bz2
 tar -xvjf linux-2.6.39.tar.bz2
-echo "setup kernel 2.6.39" >> ../$LOG_FILE
 cd linux-2.6.39
 addtogit
 wget http://www.acmesystems.it/www/ariag25_compile_linux_2_6_39/ariag25.patch.tar.gz
@@ -193,8 +252,13 @@ wget http://www.acmesystems.it/www/ariag25_compile_linux_2_6_39/ariag25.config.t
 tar -xvzf ariag25.config.tar.gz
 cd ..
 #2.6.38
-git clone git://github.com/tanzilli/foxg20-linux-2.6.38.git
+echo
+echo
+echo "S E T U P   K E R N E L   2 . 6 . 3 8"
+echo
+echo
 echo "setup kernel 2.6.38" >> ../$LOG_FILE
+git clone git://github.com/tanzilli/foxg20-linux-2.6.38.git
 cd foxg20-linux-2.6.38
 addtogit
 make foxg20_defconfig
@@ -204,12 +268,17 @@ cd ..
 }
 
 function setuprootfswheezy {
-echo "setup rootfs" >> $LOG_FILE
+echo "setup rootfs Wheezy" >> $LOG_FILE
 cd rootfs
 echo "setup rootfs Wheezy" >> ../$LOG_FILE
 mkdir multistrap_debian_wheezy
 cd multistrap_debian_wheezy
 
+echo
+echo
+echo "S E T U P   W H E E Z Y   R O O T F S   F O R   A R I A   G 2 5"
+echo
+echo
 echo "setup rootfs Wheezy for AriaG25" >> ../../$LOG_FILE
 mkdir aria
 cd aria
@@ -222,6 +291,11 @@ sudo ./aria.sh
 rootfsend
 cd ..
 
+echo
+echo
+echo "S E T U P   W H E E Z Y   R O O T F S   F O R   A R I E T T A   G 2 5"
+echo
+echo
 echo "setup rootfs Wheezy for AriettaG25" >> ../../$LOG_FILE
 mkdir arietta
 cd arietta
@@ -236,6 +310,11 @@ cd ..
 
 #foxg20 -> missing from http://www.acmesystems.it/debian_wheezy at 13/11/2015
 
+echo
+echo
+echo "S E T U P   W H E E Z Y   R O O T F S   F O R   A C Q U A"
+echo
+echo
 echo "setup rootfs Wheezy for Acqua" >> ../../$LOG_FILE
 mkdir acqua
 cd acqua
@@ -260,6 +339,11 @@ cd rootfs
 mkdir multistrap_debian_jessie
 cd multistrap_debian_jessie
 
+echo
+echo
+echo "S E T U P   J E S S I E   R O O T F S   F O R   A C Q U A"
+echo
+echo
 echo "setup rootfs Jessie for Acqua" >> ../../$LOG_FILE
 mkdir acqua
 cd acqua
@@ -272,6 +356,11 @@ sudo ./acqua.sh
 rootfsend
 cd ..
 
+echo
+echo
+echo "S E T U P   J E S S I E   R O O T F S   F O R   A R I A   G 2 5"
+echo
+echo
 echo "setup rootfs Jessie for AriaG25" >> ../../$LOG_FILE
 mkdir aria
 cd aria
@@ -284,7 +373,12 @@ sudo ./aria.sh
 rootfsend
 cd ..
 
-echo "setup rootfs Jessie for AriettaG25" >> ../../$LOG_FILE
+echo
+echo
+echo "S E T U P   J E S S I E   R O O T F S   F O R   A R I E T T A   G 2 5"
+echo
+echo
+echo "setup rootfs Jessie for AriettaG25" >> ../../$LOG_FILEecho
 mkdir arietta
 cd arietta
 wget http://www.acmesystems.it/www/debian_jessie/multistrap_arietta.conf
@@ -296,6 +390,11 @@ sudo ./arietta.sh
 rootfsend
 cd ..
 
+echo
+echo
+echo "S E T U P   J E S S I E   R O O T F S   F O R   F O X   G 2 0"
+echo
+echo
 echo "setup rootfs Jessie for FoxG20" >> ../../$LOG_FILE
 mkdir fox
 cd fox
@@ -330,6 +429,12 @@ mkdir kernel
 mkdir rootfs
 setupbootloader
 setupkernel
+echo
+echo
+echo "5/5: Setup rootfs"
+echo "-------------------------------------"
+echo
+echo
 setuprootfswheezy
 setuprootfsjessie
 theend
