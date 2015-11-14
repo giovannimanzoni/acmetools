@@ -323,14 +323,14 @@ echo
 }
 
 menu
-#validate
-#setuppackages
+validate
+setuppackages
 mkdir bootloader
 mkdir kernel
 mkdir rootfs
-#setupbootloader
-#setupkernel
-#setuprootfswheezy
+setupbootloader
+setupkernel
+setuprootfswheezy
 setuprootfsjessie
 theend
 
