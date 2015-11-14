@@ -314,7 +314,7 @@ sudo ./arietta.sh
 rootfsend
 cd ..
 
-#foxg20 -> missing from http://www.acmesystems.it/debian_wheezy at 13/11/2015
+#foxg20 -> missing multistrap for fox from http://www.acmesystems.it/debian_wheezy at 13/11/2015
 
 echo
 echo
@@ -333,7 +333,8 @@ sudo ./acqua.sh
 rootfsend
 cd ..
 
-#exit from multistrap wheezy
+
+#exit from multistrap Wheezy
 cd ..
 #exit from rootfs
 cd ..
@@ -413,7 +414,7 @@ sudo ./fox.sh
 rootfsend
 cd ..
 
-#exit from multistrap wheezy
+#exit from multistrap Jessie
 cd ..
 #exit from rootfs
 cd ..
