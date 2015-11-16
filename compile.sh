@@ -52,6 +52,13 @@ echo "4: Aria G25 256M"
 echo "5: Arietta G25 128M"
 echo "6: Arietta G25 256M"
 echo "7: Fox G20"
+echo
+echo "log saved in setup.log"
+echo
+touch $LOG_FILE
+echo "==============================" >> $LOG_FILE
+echo "$(date)   | S T A R T" >> $LOG_FILE
+
 read -n 1 BOARD
 if ! [[ "$BOARD" =~ ^[1-7]+$ ]]; then
 	wrong
@@ -318,20 +325,52 @@ function compilekernel {
 	fi
 	sleep 1
 
+	#add under git
+	echo
+	echo "Add files under git for safety"
+	echo
+	echo "$(date)   | Add files under git for safety" >> ../../$LOG_FILE
+	git add .
+	git add -f .config
+	git commit -m "keep under git for safety"
+	echo
+	sleep 2
+
 	#manage .config
 	#delete .config
 	if [ -f .config ]; then
 		echo
-		echo "Would you like to delete current kernel configuration (.config file) and make default ? [y/n/Y/N]"
+		echo "Kernel Menu Config will be opened in next step."
 		echo
-		read_yn; DELETE_CONFIG=$POINTER
-		if [[ $DELETE_CONFIG =~ ^(y|Y)$ ]]; then
+		echo "What would you like about kernel configuration (.config) ?"
+		echo "1: delete, so clean and make default"
+		echo "2: modify, so keep .config & clean generated files"
+		echo "3: nothing to do, so do not recompile kernel, already done in the past"
+		echo
+		echo "$(date)   | Kernel menu config" >> ../../$LOG_FILE
+		read -n 1 KERNEL_CONFIG
+		echo
+		if [ $KERNEL_CONFIG -eq 1 ]; then
 			rm .config
+			make ARCH=arm mrproper
 			echo "$(date)   | Delete .config" >> ../../$LOG_FILE
+		elif [ $KERNEL_CONFIG -eq 2 ]; then
+			make ARCH=arm clean
+			echo "$(date)   | Clean generated files in kernel folder but keep kernel configuration (.config)" >> ../../$LOG_FILE
+		# 3 but if .config do not exist !!
+		elif [ $KERNEL_CONFIG -eq 3 ] && [ ! -f .config ]; then
+			echo
+			echo "But .config do not exist, no previous configuration found !"
+			echo
+			echo "$(date)   | Keep previous kernel configuration but it do not exist. Exit" >> ../../$LOG_FILE
+			exit
+		elif [ $KERNEL_CONFIG -ne 3 ]; then
+			echo "$(date)   | Wrong value ( $KERNEL_CONFIG )" >> ../../$LOG_FILE
+			wrong
 		fi
 	fi
 	#if not exist, create from default
-	if [ ! -f .config ]; then
+	if ! [ -f .config ]; then
 		echo
 		echo "Create default config file"
 		echo
@@ -348,17 +387,6 @@ function compilekernel {
 	fi
 	sleep 1
 
-	#add under git
-	echo
-	echo
-	echo "add files under git"
-	echo "$(date)   | Add files under git" >> ../../$LOG_FILE
-	git add .
-	git add -f .config
-	git commit -m "update"
-	echo
-	echo
-	sleep 2
 	#compile
 	if [ $BOARD -eq $FOX ]; then
 		make menuconfig
