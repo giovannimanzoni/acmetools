@@ -264,7 +264,7 @@ function asksetup3_10 {
 	fi
 }
 
-NEED_ARIABOT=0
+NEED_ARIABOOT=0
 function asksetup2_6_39 {
 	local KERNEL_YN=''
 	if [ $KERNEL_SETUP -eq $KERNEL_SETUP_ASK ]; then
@@ -273,7 +273,7 @@ function asksetup2_6_39 {
 	fi
 	#check: valid for kernel_setup = ask (=y) or all
 	if [[ $KERNEL_YN =~ ^(y|Y)$ ]] || [ $KERNEL_SETUP -eq $KERNEL_SETUP_ALL ]; then
-		NEED_ARIABOT=1
+		NEED_ARIABOOT=1
 		setup2_6_39
 	fi
 }
@@ -697,9 +697,9 @@ if [[ $SETUPFORARIA =~ ^(y|Y)$ ]] || [[ $SETUPFORARIETTA =~ ^(y|Y)$ ]] || [[ $SE
 	rm -rf at91bootstrap-3.7
 fi
 if [[ $SETUPFORFOX =~ ^(y|Y)$ ]]; then
-echo "$(date)   | Setup acmebot" >> $LOG_FILE
-mkdir acmebot
-cd acmebot
+echo "$(date)   | Setup acmeboot" >> $LOG_FILE
+mkdir acmeboot
+cd acmeboot
 wget http://terzo.acmesystems.it/download/acmeboot/pizzica.py
 wget http://terzo.acmesystems.it/download/acmeboot/xmodem.py
 wget http://www.acmesystems.it/www/acmeboot/acmeboot_dataflash_1.22.bin
@@ -710,15 +710,15 @@ touch cmdline.txt
 echo "mem=64M console=ttyS0,115200 noinitrd root=/dev/mmcblk0p2 rw rootwait init=/sbin/init" >> cmdline.txt
 touch  machtype.txt
 echo "3129" >  machtype.txt
-#exif from acmebot
+#exif from acmeoboot
 cd ..
 fi
-if [ $NEED_ARIABOT -eq 1 ]; then
-echo "$(date)   | Setup ariabot" >> $LOG_FILE
+if [ $NEED_ARIABOOT -eq 1 ]; then
+echo "$(date)   | Setup ariaboot" >> $LOG_FILE
 git clone git://github.com/tanzilli/AriaBoot.git
 cd AriaBoot
 make
-#exit from ariabot
+#exit from ariaboot
 cd ..
 fi
 #exit from bootloader
