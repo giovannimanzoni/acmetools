@@ -83,6 +83,51 @@ readonly K3_10=5
 readonly K2_6_39=6
 readonly K2_6_38=7
 
+function kernelnotpresent () {
+	echo
+	echo "This kernel is not present on disk"
+	echo
+}
+
+function validatek () {
+VERSION=$1
+	if [ $VERSION -eq $K4_2_6 ] && [ ! -f kernel/linux-4.2.6 ]; then
+		kernelnotpresent
+		echo "$(date)   | Kernel 4.2.6 is not present on the disk" >> $LOG_FILE
+		exit
+	elif [ $VERSION -eq $K4_1_11 ] && [ ! -f kernel/linux-4.1.11 ]; then
+		kernelnotpresent
+		echo "$(date)   | Kernel 4.1.11 is not present on the disk" >> $LOG_FILE
+		exit
+	elif [ $VERSION -eq $K3_18_14 ] && [ ! -f kernel/linux-3.18.14 ]; then
+		kernelnotpresent
+		echo "$(date)   | Kernel 3.18.14 is not present on the disk" >> $LOG_FILE
+		exit
+	elif [ $VERSION -eq $K3_16_1 ] && [ ! -f kernel/linux-3.16.1 ]; then
+		kernelnotpresent
+		echo "$(date)   | Kernel 3.16.1 is not present on the disk" >> $LOG_FILE
+		exit
+	elif [ $VERSION -eq $K3_10 ] && [ ! -f kernel/linux-3.10 ]; then
+		kernelnotpresent
+		echo "$(date)   | Kernel 3.10 is not present on the disk" >> $LOG_FILE
+		exit
+	elif [ $VERSION -eq $K2_6_39 ] && [ ! -f kernel/linux-2.6.39 ]; then
+		kernelnotpresent
+		echo "$(date)   | Kernel 2.6.39 is not present on the disk" >> $LOG_FILE
+		exit
+	elif [ $VERSION -eq $K2_6_38 ] && [ ! -f kernel/linux-2.6.38 ]; then
+		kernelnotpresent
+		echo "$(date)   | Kernel 2.6.38 is not present on the disk" >> $LOG_FILE
+		exit
+	else
+		echo
+		echo "bug"
+		echo
+		exit
+	fi
+}
+
+
 function menukernel {
 echo
 echo
@@ -93,6 +138,7 @@ if [ $BOARD -eq $ACQUA256 ] || [ $BOARD -eq $ACQUA512 ]; then
 	echo "2: 4.1.11"
 	echo "5: 3.10"
 	read -n 1 KERNEL
+	validatek $KERNEL
 	if [ $KERNEL -eq 1 ] || [ $KERNEL -eq 2 ] || [ $KERNEL -eq 5 ]; then
 		echo "Ok"
 	else
@@ -105,6 +151,7 @@ elif [ $BOARD -eq $ARIAG25128 ] || [ $BOARD -eq $ARIAG25256 ]; then
 	echo "4: 3.16.1"
 	echo "6: 2.6.39"
 	read -n 1 KERNEL
+	validatek $KERNEL
 	if [ $KERNEL -eq 1 ] || [ $KERNEL -eq 2 ] || [ $KERNEL -eq 3 ] || [ $KERNEL -eq 4 ] || [ $KERNEL -eq 6 ]; then
 		echo "Ok"
 	else
@@ -116,6 +163,7 @@ elif [ $BOARD -eq $ARIETTAG25128 ] || [ $BOARD -eq $ARIETTAG25256 ]; then
 	echo "3: 3.18.14"
 	echo "4: 3.16.1"
 	read -n 1 KERNEL
+	validatek $KERNEL
 	if [ $KERNEL -eq 1 ] || [ $KERNEL -eq 2 ] || [ $KERNEL -eq 3 ] || [ $KERNEL -eq 4 ]; then
 		echo "Ok"
 	else
@@ -125,6 +173,7 @@ elif [ $BOARD -eq $ARIETTAG25128 ] || [ $BOARD -eq $ARIETTAG25256 ]; then
 elif [ $BOARD -eq $FOX ]; then
 	echo "7: 2.6.38"
 	read -n 1 KERNEL
+	validatek $KERNEL
 	if [ $KERNEL -eq 7 ]; then
 		echo "Ok"
 	else
@@ -166,12 +215,11 @@ elif [ $BOARD -eq $ARIETTAG25256 ] && [ $KERNEL -ne $K2_6_39 ];  then
 	cd at91bootstrap-3.7-arietta-256m
 	make arietta-256m_defconfig
 elif [ $BOARD -eq $FOX ] && [ $KERNEL -ne $K2_6_38 ]; then
+	cd acmeboot
 	nano cmdline.txt
 	nano macaddress.txt
-	#to be do
 elif ([ $BOARD -eq $ARIAG25128 ] || [ $BOARD -eq $ARIAG25256 ]) && [ $KERNEL -eq $K2_6_39 ]; then
-	# http://www.acmesystems.it/ariaboot
-	cd ariabot
+	cd AriaBoot
 	echo "Now you can change some parameters of bootloader."
 	echo "For 128MB of ram, you have to set CONFIG_LINUX_KERNEL_ARG_STRING to"
 	echo "mem=128M console=ttyS0,115200 noinitrd root=/dev/mmcblk0p2 rw rootwait init=/sbin/init"
@@ -182,8 +230,8 @@ elif ([ $BOARD -eq $ARIAG25128 ] || [ $BOARD -eq $ARIAG25256 ]) && [ $KERNEL -eq
 	make
 	echo
 elif [ $BOARD -eq $FOX ] && [ $KERNEL -eq $K2_6_38 ]; then
-	# http://www.acmesystems.it/acmeboot
-	echo
+	cd acmeboot
+	nano macaddress.txt
 else
 	#for all other
 	make menuconfig
@@ -387,7 +435,22 @@ function copybootloader {
 	elif [ $BOARD -eq $ARIETTAG25256 ]; then
 		cp bootloader/at91bootstrap-3.7-arietta-256m/binaries/at91sam9x5_arietta-sdcardboot-linux-zimage-dt-3.7.bin /media/$USER/boot/boot.bin
 	elif [ $BOARD -eq $FOX ]; then
-		echo "to be do"
+		echo
+		echo "Leaving the FOX Board G20 off. Connect the FOX Board G20 debug port using the DPI adapter and check if the usbserial module driver for the DPI chip is correctly installed (typing dmesg in a second shell)"
+		echo
+		echo "Do you have serialflash [1] or dataflash [2] (http://www.acmesystems.it/netus_memories) ?"
+		echo
+		read -n 1 KEY
+		if [ $KEY -eq 1  ]; then
+			sudo python pizzica.py -f acmeboot_serialflash_1.22.bin -d /dev/ttyUSB0
+		elif [ $KEY -eq 2  ]; then
+			sudo python pizzica.py -f acmeboot_dataflash_1.22.bin -d /dev/ttyUSB0
+		else
+			wrong
+		fi
+		echo "Plug the DPI on the FOX debug port and close the two contacts shown below on the Netus G20 module with something metallic, turn-on the board and immediately after that, release the two contacts. In that way the internal RomBOOT will start and Pizzica will be able to comunicate with it. The two contacts have not to be kept closed after switching the FoxG20 on, otherwise the DataFlash will not be reprogrammed"
+		echo
+		echo "Remove the contacts and see the message sent by Pizzica"
 	else
 		wrong
 	fi
@@ -460,12 +523,53 @@ function umountmemory {
 	sudo umount /media/$USER/data
 }
 
+function bootloadernotpresent () {
+	echo
+	echo "This kernel is not present on disk"
+	echo
+	exit
+}
+
+#validate bootloader by match with kernel & board
+function validateb () {
+	if [ $BOARD -eq $ACQUA256 ]; then
+		if [ ! -f  bootloader/at91bootstrap-3.7-acqua-256m ]; then
+			boootloadernotpresent
+		fi
+	elif [ $BOARD -eq $ACQUA512 ]; then
+		if [ ! -f  bootloader/at91bootstrap-3.7-acqua-512m ]; then
+			boootloadernotpresent
+		fi
+	elif [ $BOARD -eq $ARIAG25128 ]; then
+		if [ ! -f  bootloader/at91bootstrap-3.7-aria-128m ]; then
+			boootloadernotpresent
+		fi
+	elif [ $BOARD -eq $ARIAG25256 ]; then
+		if [ ! -f  bootloader/at91bootstrap-3.7-aria-256m ]; then
+			boootloadernotpresent
+		fi
+	elif [ $BOARD -eq $ARIETTAG25128 ]; then
+		if [ ! -f  bootloader/at91bootstrap-3.7-arietta-128m ]; then
+			boootloadernotpresent
+		fi
+	elif [ $BOARD -eq $ARIETTAG25256 ];  then
+		if [ ! -f  bootloader/at91bootstrap-3.7-arietta-256m ]; then
+			boootloadernotpresent
+		fi
+	elif [ $BOARD -eq $FOX ]; then
+		if [ ! -f  bootloader/at91bootstrap-3.7-acqua-512m ]; then
+			boootloadernotpresent
+		fi
+	fi
+}
+
 
 #
 # P R O G R A M
 #
 menuboard
 menukernel
+validateb #validate bootloader
 compilebootloader
 compilekernel
 copyfiles
