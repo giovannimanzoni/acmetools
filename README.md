@@ -15,7 +15,7 @@ This repo born because the problem is about gcc version:
 - Ubuntu 15 can compile/create rootfs and last kernel but can not compile at91bootstrap, it fail
 - Ubuntu 15 can compile kernel 3.18.14 but it is not usable on the micro sd !!
 - Ubuntu 15 can not compile kernel 3.16.1
-- Kernel 3.16.1 & 3.16.1 work on Wheezy but not in Jessie
+- Kernel 3.16.1 & 3.18.14 work on Wheezy but not in Jessie
 
 So the simple way is to use Ubuntu 14 but what about use old Linux distro ? :(
 and what about the benefit to compile what can be compiled with the last gcc version ?
