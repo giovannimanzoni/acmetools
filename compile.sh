@@ -351,7 +351,7 @@ function compilekernel {
 		echo "Kernel Menu Config will be opened in next step."
 		echo
 		echo "What would you like about kernel configuration (.config) ?"
-		echo "1: delete, so clean and make default"
+		echo "1: delete, so clean, make default and modify if you like"
 		echo "2: modify, so keep .config & clean generated files"
 		echo "3: nothing to do, so do not recompile kernel, already done in the past"
 		echo
@@ -399,30 +399,34 @@ function compilekernel {
 
 	#compile
 	if [ $BOARD -eq $FOX ]; then
-		make menuconfig
-		sleep 1
-		make -j8
-		echo
-		echo
-		echo
-		make modules -j8
-		echo
-		echo
-		echo
-		rm -rf ./foxg20-modules # for safety
-		make modules_install
+		if [ $KERNEL_CONFIG -ne 3 ]; then
+			make menuconfig
+			sleep 1
+			make -j8
+			echo
+			echo
+			echo
+			make modules -j8
+			echo
+			echo
+			echo
+			rm -rf ./foxg20-modules # for safety
+			make modules_install
+		fi
 	else
-		make ARCH=arm menuconfig
-		sleep 1
-		make -j8 ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- zImage
-		echo
-		echo
-		echo
-		make modules -j8 ARCH=arm CROSS_COMPILE=arm-linux-gnueabi-
-		echo
-		echo
-		echo
-		make modules_install INSTALL_MOD_PATH=./modules ARCH=arm
+		if [ $KERNEL_CONFIG -ne 3 ]; then
+			make ARCH=arm menuconfig
+			sleep 1
+			make -j8 ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- zImage
+			echo
+			echo
+			echo
+			make modules -j8 ARCH=arm CROSS_COMPILE=arm-linux-gnueabi-
+			echo
+			echo
+			echo
+			make modules_install INSTALL_MOD_PATH=./modules ARCH=arm
+		fi
 	fi
 	echo
 	echo
