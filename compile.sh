@@ -397,7 +397,7 @@ function compilekernel {
 	fi
 	sleep 1
 
-	#compile
+	#compile kernel
 	if [ $BOARD -eq $FOX ]; then
 		if [ $KERNEL_CONFIG -ne 3 ]; then
 			make menuconfig
@@ -428,6 +428,36 @@ function compilekernel {
 			make modules_install INSTALL_MOD_PATH=./modules ARCH=arm
 		fi
 	fi
+
+	#compile dtb
+	echo
+	echo "Would you like modify the device tree (.dts) ? y/n/Y/N"
+	echo
+	read_yn; DTB_MOD=$POINTER
+	if [ $BOARD -eq $ARIETTAG25128 ] || [ $BOARD -eq $ARIETTAG25256 ]; then
+		if [[ $DTB_MOD =~ ^(y|Y)$ ]]; then
+			nano arch/arm/boot/dts/acme-arietta.dts
+		fi
+		#if not exist, make it
+		if [ ! -f arch/arm/boot/dts/acme-arietta.dtb ]; then
+			make ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- acme-arietta.dtb
+		fi
+	elif [ $BOARD -eq $ARIAG25128 ] || [ $BOARD -eq $ARIAG25256 ]; then
+		if [[ $DTB_MOD =~ ^(y|Y)$ ]]; then
+			nano arch/arm/boot/dts/acme-aria.dts
+		fi
+		if [ ! -f arch/arm/boot/dts/acme-aria.dtb ]; then
+			make ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- acme-aria.dtb
+		fi
+	elif [ $BOARD -eq $ACQUA256 ] || [ $BOARD -eq $ACQUA512 ]; then
+		if [[ $DTB_MOD =~ ^(y|Y)$ ]]; then
+			nano arch/arm/boot/dts/acme-acqua.dts
+		fi
+		if [ ! -f arch/arm/boot/dts/acme-acqua.dtb ]; then
+			make ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- acme-acqua.dtb
+		fi
+	fi
+
 	echo
 	echo
 	echo
@@ -498,10 +528,22 @@ function copyrootfs {
 	echo
 	sleep 1
 	if [ $KERNEL -eq $K2_6_38 ] || [ $KERNEL -eq $K2_6_39 ] || [ $KERNEL -eq $K3_10 ] || [ $KERNEL -eq $K3_16_1 ] || [ $KERNEL -eq $K3_18_14 ]; then
-		sudo rsync -axHAX --progress rootfs/multistrap_debian_wheezy/target-rootfs/ /media/$USER/rootfs/
+		if [ $BOARD -eq $ACQUA256 ] || [ $BOARD -eq $ACQUA512 ]; then
+			sudo rsync -axHAX --progress rootfs/multistrap_debian_wheezy/acqua/target-rootfs/ /media/$USER/rootfs/
+		elif [ $BOARD -eq $ARIAG25128 ] || [ $BOARD -eq $ARIAG25256 ]; then
+			sudo rsync -axHAX --progress rootfs/multistrap_debian_wheezy/aria/target-rootfs/ /media/$USER/rootfs/
+		elif [ $BOARD -eq $ARIETTAG25128 ] || [ $BOARD -eq $ARIETTAG25256 ]; then
+			sudo rsync -axHAX --progress rootfs/multistrap_debian_wheezy/arietta/target-rootfs/ /media/$USER/rootfs/
+		fi
 	else
-		#newer kernel
-		sudo rsync -axHAX --progress rootfs/multistrap_debian_jessie/target-rootfs/ /media/$USER/rootfs/
+		#for newer kernel
+		if [ $BOARD -eq $ACQUA256 ] || [ $BOARD -eq $ACQUA512 ]; then
+			sudo rsync -axHAX --progress rootfs/multistrap_debian_jessie/acqua/target-rootfs/ /media/$USER/rootfs/
+		elif [ $BOARD -eq $ARIAG25128 ] || [ $BOARD -eq $ARIAG25256 ]; then
+			sudo rsync -axHAX --progress rootfs/multistrap_debian_jessie/aria/target-rootfs/ /media/$USER/rootfs/
+		elif [ $BOARD -eq $ARIETTAG25128 ] || [ $BOARD -eq $ARIETTAG25256 ]; then
+			sudo rsync -axHAX --progress rootfs/multistrap_debian_jessie/arietta/target-rootfs/ /media/$USER/rootfs/
+		fi
 	fi
 }
 
@@ -551,10 +593,19 @@ function copykernel {
 }
 
 function umountmemory {
+	echo
+	echo "Remember to do depmod -a on target"
+	echo
+	echo "sync files. . . Please wait"
+	echo
 	sync
 	sudo umount /media/$USER/BOOT
 	sudo umount /media/$USER/rootfs
 	sudo umount /media/$USER/data
+	echo
+	echo "You can safety remove the micro sd"
+	echo
+
 }
 
 function bootloadernotpresent () {

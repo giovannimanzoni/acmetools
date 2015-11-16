@@ -29,20 +29,25 @@ So, let me try
 
 setup.sh 
 ----------
+16/11/2015 I think it could be ok
 16/11/2015 under test
+
 Use it for download, initial setup, but not compile:
 - bootloader
 - kernel + dts + patch
 - rootfs
 
 
-clean.sh <- complete
+clean.sh
 ----------
+
 Use it for remove all generated files and folder, used for debug/test 'setup.sh'
 
 
-compile.sh <- work in progress
+compile.sh
 ----------
+16/11/2015 I think it could be ok
+
 Use it for compile the system and prepare all files for the micro sd. 
 The script will ask you what is your target (Acme Systems board name)
 and it will propose what you can choose (as kernel version)
