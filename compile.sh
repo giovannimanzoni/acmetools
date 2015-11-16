@@ -210,12 +210,12 @@ function compilekernel {
 function copyfiles {
 	echo
 	echo
-	echo "Insert micro sd and Press Enter for copy files on it"
-	echo
+	echo "Insert right partitioned micro sd and Press Enter for copy files on it"
+	echo "visit  http://www.acmesystems.it/microsd_format  for how do it"
 	echo
 	read KEY
 	copybootloader
-	copyroofts
+	copyrootfs
 	copykernel
 }
 
