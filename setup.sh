@@ -1,14 +1,20 @@
 #!/bin/bash
 #
-# This file prepare a complete setup on a pc for all Acme Systems products
+# This file for compile the system and prepare all files for the micro sd.
+# The script will ask you what is your target (Acme Systems board name)
+# and it will propose what you can choose (as kernel version)
+# and it will use or ask the right rootfs that is needed (Jessie / Wheezy)
 #
-# Copyright (C) 2015 Giovanni Manzoni <commerciale@hardelettrosoft.com>
 #
 # Licensed under GPLv2 or later.
-#
+# Creative Commons License
+# This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.
+# Author: Giovanni Manzoni (commerciale@hardelettrosoft.com)
+# Based on work of : Sergio Tanzilli (sergio@tanzilli.com)
+##
 
 LOG_FILE='setup.log'
-
+POINTER= #function return values
 function addtogit {
 git init
 git add .
@@ -18,25 +24,51 @@ git checkout acme
 }
 
 function rootfscommon {
-sudo cp /usr/bin/qemu-arm-static target-rootfs/usr/bin
-sudo mount -o bind /dev/ target-rootfs/dev/
+ARCH=$1
+CONF=$2
+local YN=''
+until [[ $YN =~ ^(y|Y)$   ]]; do
+	echo
+	echo
+	echo "NOW PAY ATENTION IF APT-GET FAIL OR NOT TO DOWNLOAD SOME PACKAGE"
+	echo "If fail, the rootfs folder is not complete and construction of rootfs can not be complete"
+	echo "THE SCRIPT NEED REPEAT THIS STEP. Please press any key"
+	echo
+	echo
+	read -n 1 KEY
+
+	sudo multistrap -a $ARCH -f $CONF
+	sudo cp /usr/bin/qemu-arm-static target-rootfs/usr/bin
+	sudo mount -o bind /dev/ target-rootfs/dev/
+	echo
+	beep
+	echo
+	echo
+	echo ">>>> Does the apt-get step end without problem ? [y/n/Y/N] <<<<"
+	echo
+	read_yn
+	YN=$POINTER
+	if [[ $YN  =~ ^(n|N)$ ]]; then
+		echo "Setup of rootfs with multistrap failed" >> ../../$LOG_FILE
+		sudo umount target-rootfs/dev/
+		echo
+		echo "So, this step will be repeat. Downloaded files will be deleted. Press any key"
+		read -n 1 KEY
+		sudo rm -rf target-rootfs
+	else
+		echo "Setup of rootfs with multistrap Pass" >> ../../$LOG_FILE
+	fi
+done
 echo
-beep
+echo "Choose 'No' when ask configuring dash. Press any key"
 echo
-echo
-echo "PAY ATENTION TO THE PREVIOUS LINE IF APT-GET FAIL OR NOT TO DOWNLOAD SOME PACKAGE "
-echo "If yes, the rootfs folder is not complete and costruction of rootfs can not continue ! ! ! !"
-echo
-echo
-echo "Choose 'No' when ask configuring dash. press Enter"
-echo
-read
+read -n 1
 sudo LC_ALL=C LANGUAGE=C LANG=C chroot target-rootfs dpkg --configure -a
 }
 
 function rootfsend {
 echo
-echo ">>>> Insert root password FOR TARGET BOARD<<<<"
+echo ">>>> Insert root password FOR TARGET BOARD <<<<"
 echo
 sudo chroot target-rootfs passwd
 # sudo rm target-rootfs/usr/bin/qemu-arm-static
@@ -48,17 +80,70 @@ echo
 echo
 echo "First setup"
 echo
-echo "1: Validate Host requirement"
-echo "2: Setup packages from apt-get"
-echo "3: Setup at91bootstrap"
-echo "4: Setup rootfs"
-echo "5: Setup kernel"
+echo "1: Select Acme Systems boards to setup for"
+echo "2: Validate Host requirement"
+echo "3: Setup packages from apt-get"
+echo "4: Setup kernel"
+echo "5: Setup rootfs"
+echo "6: Setup bootloader" #depend of kernel version
 echo
 echo "log saved in setup.log"
 echo
-echo "P R E S S     E N T E R     T O     S T A R T"
+echo "P R E S S     A N Y     K E Y     T O     S T A R T"
 echo
-read KEY
+read -n 1 KEY
+touch $LOG_FILE
+echo "==============================" >> $LOG_FILE
+echo "$(date)   | S T A R T" >> $LOG_FILE
+}
+
+function read_yn {
+	local YN=''
+	until [[ $YN =~ ^(y|n|Y|N)$ ]];	do
+		read -n 1 YN
+		if [[ $YN =~ ^(y|Y)$ ]]; then
+			echo "-> Yes"
+		elif [[ $YN =~ ^(n|N)$ ]]; then
+			echo "-> No"
+		else
+			echo
+			echo "Please use only y/n/Y/N key"
+		fi
+	done
+	POINTER=$YN
+}
+
+SETUPFORACQUA=0
+SETUPFORARIA=0
+SETUPFORARIETTA=0
+SETUPFORFOX=0
+function selectacmeboards {
+	echo
+	echo
+	echo "1/6: Please select Acme boards"
+	echo "-------------------------------------"
+	echo
+	echo "Do you want configure Host for Acqua A5? [y/n/Y/N]"
+	read_yn; SETUPFORACQUA=$POINTER
+	echo "$(date)   | Setup for Acqua A5 -> $SETUPFORACQUA" >> $LOG_FILE
+	echo
+	echo "Do you want configure Host for Aria G25? [y/n/Y/N]"
+	read_yn; SETUPFORARIA=$POINTER
+	echo "$(date)   | Setup for Aria G25 -> $SETUPFORARIA" >> $LOG_FILE
+	echo
+	echo "Do you want configure Host for Arietta G25? [y/n/Y/N]"
+	read_yn; SETUPFORARIETTA=$POINTER
+	echo "$(date)   | Setup for Arietta G25 -> $SETUPFORARIETTA" >> $LOG_FILE
+	echo
+	echo "Do you want configure Host for Fox G20? [y/n/Y/N]"
+	read_yn; SETUPFORFOX=$POINTER
+	echo "$(date)   | Setup for Fox G20 -> $SETUPFORFOX" >> $LOG_FILE
+	echo
+	if [[ $SETUPFORACQUA =~ ^(n|N)$ ]] && [[ $SETUPFORARIA =~ ^(n|N)$ ]] && [[ $SETUPFORARIETTA =~ ^(n|N)$ ]] && [[ $SETUPFORFOX =~ ^(n|N)$ ]]; then
+		echo "You have not chosen any board. Exit"
+		echo
+		exit
+	fi
 }
 
 function validate {
@@ -66,83 +151,196 @@ function validate {
 #cat /etc/issue
 echo
 echo
-echo "1/5: Validate Host requirement"
+echo "2/6: Validate Host requirement"
 echo "-------------------------------------"
 echo "To be do"
 echo
-touch $LOG_FILE
-echo "==============================" >> $LOG_FILE
-echo "S T A R T" >> $LOG_FILE
-NOW=$(date)
-echo "$NOW" >> $LOG_FILE
 
 #validate - to be do
 }
 
+
+
 function setuppackages {
-# setup package
 echo
 echo
-echo "2/5: Setup package from apt-get"
+echo "3/6: Setup package from apt-get"
 echo "-------------------------------------"
 echo
 echo
 echo "If apt-get fail, your repositories are old !! you have to setup old-releases repo, look at http://wiki.ubuntu-it.org/Repository/SourcesList/EOL"
 echo
-echo "Press Enter"
+echo "Press any key to next step"
 echo
-read KEY
-echo "Setup package" >> $LOG_FILE
+read -n 1 KEY
+echo "$(date)   | Setup package" >> $LOG_FILE
 sudo apt-get update
-sudo apt-get install libc6-armel-cross libc6-dev-armel-cross binutils-arm-linux-gnueabi libncurses5-dev gcc-arm-linux-gnueabi g++-arm-linux-gnueabi gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf gparted git multistrap qemu qemu-user-static binfmt-support dpkg-cross beep
+sudo apt-get install libc6-armel-cross libc6-dev-armel-cross binutils-arm-linux-gnueabi libncurses5-dev beep gparted git multistrap qemu qemu-user-static binfmt-support dpkg-cross
+
+if  [[ $SETUPFORACQUA =~ ^(y|Y)$ ]]; then
+	sudo apt-get install gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf
+fi
+if [[ $SETUPFORARIA =~ ^(y|Y)$ ]] || [[ $SETUPFORARIETTA =~ ^(y|Y)$ ]] || [[ $SETUPFORFOX =~ ^(y|Y)$ ]]; then
+	sudo apt-get install gcc-arm-linux-gnueabi g++-arm-linux-gnueabi
+fi
+if [[ $SETUPFORFOX =~ ^(y|Y)$ ]]; then
+	sudo apt-get install python python-serial
+fi
 }
 
-function setupbootloader {
-#bootloader
-#only if ubuntu <=14
-# cat /etc/issue - to be do
-echo
-echo
-echo "3/5: Setup bootloader"
-echo "-------------------------------------"
-echo
-echo
-echo "Setup bootloader" >> $LOG_FILE
-mkdir bootloader
-cd bootloader
-#at91bootsrap
-wget https://github.com/linux4sam/at91bootstrap/archive/v3.7.zip
-unzip v3.7.zip
-cd at91bootstrap-3.7
-wget https://raw.githubusercontent.com/AcmeSystems/acmepatches/master/at91bootstrap-3.7.patch
-patch -p1 <  at91bootstrap-3.7.patch
-cd ..
-cp -R at91bootstrap-3.7 at91bootstrap-3.7-acqua-256m
-cp -R at91bootstrap-3.7 at91bootstrap-3.7-acqua-512m
-cp -R at91bootstrap-3.7 at91bootstrap-3.7-aria-128m
-cp -R at91bootstrap-3.7 at91bootstrap-3.7-aria-256m
-cp -R at91bootstrap-3.7 at91bootstrap-3.7-arietta-128m
-mv    at91bootstrap-3.7 at91bootstrap-3.7-arietta-256m
+readonly KERNEL_SETUP_LAST=1
+readonly KERNEL_SETUP_ALL=2
+readonly KERNEL_SETUP_ASK=3
+
+function asksetup4_2_6 {
+	local KERNEL_YN=''
+	if [ $KERNEL_SETUP -eq $KERNEL_SETUP_ASK ]; then
+		echo "Do you want configure Kernel 4.2.6 ? [y/n/Y/N]"
+		read_yn; KERNEL_YN=$POINTER
+	fi
+	#check: valid for (kernel_setup = ask & answer =y) or (all) or (last)
+	if [[ $KERNEL_YN =~ ^(y|Y)$ ]] || [ $KERNEL_SETUP -ne $KERNEL_SETUP_ASK ]; then
+		setup4_2_6
+	fi
+}
+
+function asksetup4_1_11 {
+	local KERNEL_YN=''
+	if [ $KERNEL_SETUP -eq $KERNEL_SETUP_ASK ]; then
+		echo "Do you want configure Kernel 4.1.11 ? [y/n/Y/N]"
+		read_yn; KERNEL_YN=$POINTER
+	fi
+	#check: valid for kernel_setup = ask (=y) or all
+	if [[ $KERNEL_YN =~ ^(y|Y)$ ]] || [ $KERNEL_SETUP -eq $KERNEL_SETUP_ALL ]; then
+		setup4_1_11
+	fi
+}
+
+function asksetup3_18_14 {
+	local KERNEL_YN=''
+	if [ $KERNEL_SETUP -eq $KERNEL_SETUP_ASK ]; then
+		echo "Do you want configure Kernel 3.18.14 ? [y/n/Y/N]"
+		read_yn; KERNEL_YN=$POINTER
+	fi
+	#check: valid for kernel_setup = ask (=y) or all
+	if [[ $KERNEL_YN =~ ^(y|Y)$ ]] || [ $KERNEL_SETUP -eq $KERNEL_SETUP_ALL ]; then
+		setup3_18_14
+	fi
+}
+
+function asksetup3_16_1 {
+	local KERNEL_YN=''
+	if [ $KERNEL_SETUP -eq $KERNEL_SETUP_ASK ]; then
+		echo "Do you want configure Kernel 3.16.1 ? [y/n/Y/N]"
+		read_yn; KERNEL_YN=$POINTER
+	fi
+	#check: valid for kernel_setup = ask (=y) or all
+	if [[ $KERNEL_YN =~ ^(y|Y)$ ]] || [ $KERNEL_SETUP -eq $KERNEL_SETUP_ALL ]; then
+		setup3_16_1
+	fi
+}
+
+function asksetup3_14_23 {
+	local KERNEL_YN=''
+	if [ $KERNEL_SETUP -eq $KERNEL_SETUP_ASK ]; then
+		echo "Do you want configure Kernel 3.14.23 ? [y/n/Y/N]"
+		read_yn; KERNEL_YN=$POINTER
+	fi
+	#check: valid for kernel_setup = ask (=y) or all
+	if [[ $KERNEL_YN =~ ^(y|Y)$ ]] || [ $KERNEL_SETUP -eq $KERNEL_SETUP_ALL ]; then
+		setup3_14_23
+	fi
+}
+
+function asksetup3_10 {
+	local KERNEL_YN=''
+	if [ $KERNEL_SETUP -eq $KERNEL_SETUP_ASK ]; then
+		echo "Do you want configure Kernel 3.10 ? [y/n/Y/N]"
+		read_yn; KERNEL_YN=$POINTER
+	fi
+	#check: valid for kernel_setup = ask (=y) or all
+	if [[ $KERNEL_YN =~ ^(y|Y)$ ]] || [ $KERNEL_SETUP -eq $KERNEL_SETUP_ALL ]; then
+		setup3_10
+	fi
+}
+
+NEED_ARIABOT=0
+function asksetup2_6_39 {
+	local KERNEL_YN=''
+	if [ $KERNEL_SETUP -eq $KERNEL_SETUP_ASK ]; then
+		echo "Do you want configure Kernel 2.6.39 ? [y/n/Y/N]"
+		read_yn; KERNEL_YN=$POINTER
+	fi
+	#check: valid for kernel_setup = ask (=y) or all
+	if [[ $KERNEL_YN =~ ^(y|Y)$ ]] || [ $KERNEL_SETUP -eq $KERNEL_SETUP_ALL ]; then
+		NEED_ARIABOT=1
+		setup2_6_39
+	fi
+}
+
+function asksetup2_6_38 {
+	local KERNEL_YN=''
+	if [ $KERNEL_SETUP -eq $KERNEL_SETUP_ASK ]; then
+		echo "Do you want configure Kernel 2.6.38 ? [y/n/Y/N]"
+		read_yn; KERNEL_YN=$POINTER
+	fi
+	#check: valid for kernel_setup = ask (=y) or all
+	if [[ $KERNEL_YN =~ ^(y|Y)$ ]] || [ $KERNEL_SETUP -eq $KERNEL_SETUP_ALL ]; then
+		setup2_6_38
+	fi
 }
 
 function setupkernel {
-#kernel
-cd ..
 echo
 echo
-echo "4/5: Setup kernel"
+echo "4/6: Setup kernel"
 echo "-------------------------------------"
 echo
-echo
-echo "Setup kernel" >> $LOG_FILE
+echo "$(date)   | Setup kernel" >> $LOG_FILE
+echo "In compatibility with your selected boards, which version of kernel you want ?"
+echo "1: Only last kernel"
+echo "2: All kernel tested by Acme Systems"
+echo "3: Ask 1-by-1 if download and configure or skip"
+read -n 1 KERNEL_SETUP
+
 cd kernel
+
+if  [[ $SETUPFORARIA =~ ^(y|Y)$ ]] || [[ $SETUPFORARIETTA =~ ^(y|Y)$ ]] || [[ $SETUPFORACQUA =~ ^(y|Y)$ ]]; then
+	asksetup4_2_6
+fi
+if  [[ $SETUPFORARIA =~ ^(y|Y)$ ]] || [[ $SETUPFORARIETTA =~ ^(y|Y)$ ]] || [[ $SETUPFORACQUA =~ ^(y|Y)$ ]]; then
+	asksetup4_1_11
+fi
+if  [[ $SETUPFORARIA =~ ^(y|Y)$ ]] || [[ $SETUPFORARIETTA =~ ^(y|Y)$ ]]; then
+	asksetup3_18_14
+fi
+if  [[ $SETUPFORARIA =~ ^(y|Y)$ ]] || [[ $SETUPFORARIETTA =~ ^(y|Y)$ ]]; then
+	asksetup3_16_1
+fi
+if [[ $SETUPFORARIETTA =~ ^(y|Y)$ ]]; then
+	asksetup3_14_23
+fi
+if [[ $SETUPFORACQUA =~ ^(y|Y)$ ]]; then
+	asksetup3_10
+fi
+if [[ $SETUPFORARIA =~ ^(y|Y)$ ]]; then
+	asksetup2_6_39
+fi
+if [[ $SETUPFORFOX =~ ^(y|Y)$ ]]; then
+	asksetup2_6_38
+fi
+#exit from kernel folder
+cd ..
+}
+
+function setup4_2_6 {
 #4.2.6
 echo
 echo
 echo "S E T U P   K E R N E L   4 . 2 . 6"
 echo
 echo
-echo "Setup kernel 4.2.6" >> ../$LOG_FILE
+echo "$(date)   | Setup kernel 4.2.6" >> ../$LOG_FILE
 wget https://www.kernel.org/pub/linux/kernel/v4.x/linux-4.2.6.tar.xz
 tar xvfJ linux-4.2.6.tar.xz
 cd linux-4.2.6
@@ -150,13 +348,15 @@ addtogit
 wget https://raw.githubusercontent.com/AcmeSystems/acmepatches/master/linux-4.2.6.patch
 patch -p1 < linux-4.2.6.patch
 cd ..
-#4.1.11
+}
+
+function setup4_1_11 {
 echo
 echo
 echo "S E T U P   K E R N E L   4 . 1 . 1 1"
 echo
 echo
-echo "Setup kernel 4.1.11" >> ../$LOG_FILE
+echo "$(date)   | Setup kernel 4.1.11" >> ../$LOG_FILE
 wget https://www.kernel.org/pub/linux/kernel/v4.x/linux-4.1.11.tar.xz
 tar xvfJ linux-4.1.11.tar.xz
 cd linux-4.1.11
@@ -164,13 +364,15 @@ addtogit
 wget https://raw.githubusercontent.com/AcmeSystems/acmepatches/master/linux-4.1.11.patch
 patch -p1 < linux-4.1.11.patch
 cd ..
-#3.18.11
+}
+
+function setup3_18_14 {
 echo
 echo
 echo "S E T U P   K E R N E L   3 . 1 8 . 1 4"
 echo
 echo
-echo "Setup kernel 3.18.14" >> ../$LOG_FILE
+echo "$(date)   | Setup kernel 3.18.14" >> ../$LOG_FILE
 wget https://www.kernel.org/pub/linux/kernel/v3.x/linux-3.18.14.tar.xz
 tar xvfJ linux-3.18.14.tar.xz
 cd linux-3.18.14
@@ -183,13 +385,15 @@ wget http://www.acmesystems.it/www/compile_linux_3_18/acme-arietta.dts
 wget http://www.acmesystems.it/www/compile_linux_3_18/acme-aria.dts
 mv *.dts arch/arm/boot/dts/
 cd ..
-#3.16.1
+}
+
+function setup3_16_1 {
 echo
 echo
 echo "S E T U P   K E R N E L   3 . 1 6 . 1"
 echo
 echo
-echo "Setup kernel 3.16.1" >> ../$LOG_FILE
+echo "$(date)   | Setup kernel 3.16.1" >> ../$LOG_FILE
 wget https://www.kernel.org/pub/linux/kernel/v3.x/linux-3.16.1.tar.xz
 tar xvfJ linux-3.16.1.tar.xz
 cd linux-3.16.1
@@ -202,13 +406,15 @@ wget http://www.acmesystems.it/www/compile_linux_3_16/acme-aria.dts
 wget http://www.acmesystems.it/www/compile_linux_3_16/acme-arietta.dts
 mv *.dts arch/arm/boot/dts/
 cd ..
-#3.14.23
+}
+
+function setup3_14_23 {
 echo
 echo
 echo "S E T U P   K E R N E L   3 . 1 4 . 2 3"
 echo
 echo
-echo "Setup kernel 3.14.23" >> ../$LOG_FILE
+echo "$(date)   | Setup kernel 3.14.23" >> ../$LOG_FILE
 wget https://www.kernel.org/pub/linux/kernel/v3.x/linux-3.14.23.tar.xz
 tar xvfJ linux-3.14.23.tar.xz
 cd linux-3.14.23
@@ -218,13 +424,15 @@ mv acme-arietta_defconfig arch/arm/configs/
 wget http://www.acmesystems.it/www/compile_linux_3_14/acme-arietta.dts
 mv *.dts arch/arm/boot/dts/
 cd ..
-#3.10
+}
+
+function setup3_10 {
 echo
 echo
 echo "S E T U P   K E R N E L   3 . 1 0"
 echo
 echo
-echo "Setup kernel 3.10" >> ../$LOG_FILE
+echo "$(date)   | Setup kernel 3.10" >> ../$LOG_FILE
 wget https://github.com/linux4sam/linux-at91/archive/linux-3.10-at91.zip
 unzip linux-3.10-at91.zip
 mv linux-at91-linux-3.10-at91 linux-3.10-acqua
@@ -240,13 +448,15 @@ mv *.dts arch/arm/boot/dts/
 wget http://www.acmesystems.it/www/compile_linux_3_10_acqua/acme-acqua_defconfig
 mv acme-acqua_defconfig arch/arm/configs/
 cd ..
-#2.6.39
+}
+
+function setup2_6_39 {
 echo
 echo
 echo "S E T U P   K E R N E L   2 . 6 . 3 9"
 echo
 echo
-echo "Setup kernel 2.6.39" >> ../$LOG_FILE
+echo "$(date)   | Setup kernel 2.6.39" >> ../$LOG_FILE
 wget http://www.kernel.org/pub/linux/kernel/v2.6/linux-2.6.39.tar.bz2
 tar -xvjf linux-2.6.39.tar.bz2
 cd linux-2.6.39
@@ -257,82 +467,96 @@ patch -p1 < ariag25.patch
 wget http://www.acmesystems.it/www/ariag25_compile_linux_2_6_39/ariag25.config.tar.gz
 tar -xvzf ariag25.config.tar.gz
 cd ..
-#2.6.38
+}
+
+function setup2_6_38 {
 echo
 echo
 echo "S E T U P   K E R N E L   2 . 6 . 3 8"
 echo
 echo
-echo "Setup kernel 2.6.38" >> ../$LOG_FILE
+echo "$(date)   | Setup kernel 2.6.38" >> ../$LOG_FILE
 git clone git://github.com/tanzilli/foxg20-linux-2.6.38.git
 cd foxg20-linux-2.6.38
 addtogit
 make foxg20_defconfig
 cd ..
-# exit from rootfs folder
-cd ..
 }
 
-function setuprootfswheezy {
-echo "Setup rootfs Wheezy" >> $LOG_FILE
-cd rootfs
-echo "Setup rootfs Wheezy" >> ../$LOG_FILE
-mkdir multistrap_debian_wheezy
-cd multistrap_debian_wheezy
-
+function setupwheezyaria {
 echo
 echo
 echo "S E T U P   W H E E Z Y   R O O T F S   F O R   A R I A   G 2 5"
 echo
 echo
-echo "Setup rootfs Wheezy for AriaG25" >> ../../$LOG_FILE
+echo "$(date)   | Setup rootfs Wheezy for AriaG25" >> ../../$LOG_FILE
 mkdir aria
 cd aria
 wget http://www.acmesystems.it/www/debian_wheezy/multistrap_aria.conf
-sudo multistrap -a armel -f multistrap_aria.conf
-rootfscommon
+rootfscommon armel multistrap_aria.conf
 wget http://www.acmesystems.it/www/debian_wheezy/aria.sh
 chmod +x aria.sh
 sudo ./aria.sh
 rootfsend
 cd ..
+}
 
+function setupwheezyarietta {
 echo
 echo
 echo "S E T U P   W H E E Z Y   R O O T F S   F O R   A R I E T T A   G 2 5"
 echo
 echo
-echo "Setup rootfs Wheezy for AriettaG25" >> ../../$LOG_FILE
+echo "$(date)   | Setup rootfs Wheezy for AriettaG25" >> ../../$LOG_FILE
 mkdir arietta
 cd arietta
 wget http://www.acmesystems.it/www/debian_wheezy/multistrap_arietta.conf
-sudo multistrap -a armel -f multistrap_arietta.conf
-rootfscommon
+rootfscommon armel multistrap_arietta.conf
 wget http://www.acmesystems.it/www/debian_wheezy/arietta.sh
 chmod +x arietta.sh
 sudo ./arietta.sh
 rootfsend
 cd ..
+}
 
-#foxg20 -> missing multistrap for fox from http://www.acmesystems.it/debian_wheezy at 13/11/2015
-
+function setupforacqua {
 echo
 echo
 echo "S E T U P   W H E E Z Y   R O O T F S   F O R   A C Q U A"
 echo
 echo
-echo "Setup rootfs Wheezy for Acqua" >> ../../$LOG_FILE
+echo "$(date)   | Setup rootfs Wheezy for Acqua" >> ../../$LOG_FILE
 mkdir acqua
 cd acqua
 wget http://www.acmesystems.it/www/debian_wheezy/multistrap_acqua.conf
-sudo multistrap -a armhf -f multistrap_acqua.conf
-rootfscommon
+rootfscommon armhf multistrap_acqua.conf
 wget http://www.acmesystems.it/www/debian_wheezy/acqua.sh
 chmod +x acqua.sh
 sudo ./acqua.sh
 rootfsend
 cd ..
+}
 
+function setuprootfswheezy {
+echo "$(date)   | Setup rootfs Wheezy" >> $LOG_FILE
+cd rootfs
+echo "$(date)   | Setup rootfs Wheezy" >> ../$LOG_FILE
+mkdir multistrap_debian_wheezy
+cd multistrap_debian_wheezy
+
+if [[ $SETUPFORARIA =~ ^(y|Y)$ ]]; then
+	setupwheezyaria
+fi
+if [[ $SETUPFORARIETTA =~ ^(y|Y)$ ]]; then
+	setupwheezyarietta
+fi
+if [[ $SETUPFORACQUA =~ ^(y|Y)$ ]]; then
+	setupwheezyacqua
+fi
+#foxg20 -> missing multistrap for fox from http://www.acmesystems.it/debian_wheezy at 13/11/2015
+#if [ $SETUPFORFOX =~ ^(y|Y)$ ]; then
+#	setupwheezyaria
+#fi
 
 #exit from multistrap Wheezy
 cd ..
@@ -340,79 +564,96 @@ cd ..
 cd ..
 }
 
-function setuprootfsjessie {
-echo "Setup rootfs Jessie" >> ../$LOG_FILE
-cd rootfs
-mkdir multistrap_debian_jessie
-cd multistrap_debian_jessie
-
-echo
-echo
-echo "S E T U P   J E S S I E   R O O T F S   F O R   A C Q U A"
-echo
-echo
-echo "Setup rootfs Jessie for Acqua" >> ../../$LOG_FILE
-mkdir acqua
-cd acqua
-wget http://www.acmesystems.it/www/debian_jessie/multistrap_acqua.conf
-sudo multistrap -a armel -f multistrap_acqua.conf
-rootfscommon
-wget http://www.acmesystems.it/www/debian_jessie/acqua.sh
-chmod +x acqua.sh
-sudo ./acqua.sh
-rootfsend
-cd ..
-
+function setupjessiearia {
 echo
 echo
 echo "S E T U P   J E S S I E   R O O T F S   F O R   A R I A   G 2 5"
 echo
 echo
-echo "Setup rootfs Jessie for AriaG25" >> ../../$LOG_FILE
+echo "$(date)   | Setup rootfs Jessie for AriaG25" >> ../../$LOG_FILE
 mkdir aria
 cd aria
 wget http://www.acmesystems.it/www/debian_jessie/multistrap_aria.conf
-sudo multistrap -a armel -f multistrap_aria.conf
-rootfscommon
+rootfscommon armel multistrap_aria.conf
 wget http://www.acmesystems.it/www/debian_jessie/aria.sh
 chmod +x aria.sh
 sudo ./aria.sh
 rootfsend
 cd ..
+}
 
+function setupjessiearietta {
 echo
 echo
 echo "S E T U P   J E S S I E   R O O T F S   F O R   A R I E T T A   G 2 5"
 echo
 echo
-echo "Setup rootfs Jessie for AriettaG25" >> ../../$LOG_FILEecho
+echo "$(date)   | Setup rootfs Jessie for AriettaG25" >> ../../$LOG_FILEecho
 mkdir arietta
 cd arietta
 wget http://www.acmesystems.it/www/debian_jessie/multistrap_arietta.conf
-sudo multistrap -a armel -f multistrap_arietta.conf
-rootfscommon
+rootfscommon armel multistrap_arietta.conf
 wget http://www.acmesystems.it/www/debian_jessie/arietta.sh
 chmod +x arietta.sh
 sudo ./arietta.sh
 rootfsend
 cd ..
+}
 
+function setupjessieacqua {
+echo
+echo
+echo "S E T U P   J E S S I E   R O O T F S   F O R   A C Q U A"
+echo
+echo
+echo "$(date)   | Setup rootfs Jessie for Acqua" >> ../../$LOG_FILE
+mkdir acqua
+cd acqua
+wget http://www.acmesystems.it/www/debian_jessie/multistrap_acqua.conf
+rootfscommon armel multistrap_acqua.conf
+wget http://www.acmesystems.it/www/debian_jessie/acqua.sh
+chmod +x acqua.sh
+sudo ./acqua.sh
+rootfsend
+cd ..
+}
+
+function setupjessiefox {
 echo
 echo
 echo "S E T U P   J E S S I E   R O O T F S   F O R   F O X   G 2 0"
 echo
 echo
-echo "Setup rootfs Jessie for FoxG20" >> ../../$LOG_FILE
+echo "$(date)   | Setup rootfs Jessie for FoxG20" >> ../../$LOG_FILE
 mkdir fox
 cd fox
 wget http://www.acmesystems.it/www/debian_jessie/multistrap_fox.conf
-sudo multistrap -a armel -f multistrap_fox.conf
-rootfscommon
+rootfscommon armel multistrap_fox.conf
 wget http://www.acmesystems.it/www/debian_jessie/fox.sh
 chmod +x fox.sh
 sudo ./fox.sh
 rootfsend
 cd ..
+}
+
+function setuprootfsjessie {
+echo "$(date)   | Setup rootfs Jessie" >> ../$LOG_FILE
+cd rootfs
+mkdir multistrap_debian_jessie
+cd multistrap_debian_jessie
+
+if [[ $SETUPFORARIA =~ ^(y|Y)$ ]]; then
+	setupjessiearia
+fi
+if [[ $SETUPFORARIETTA =~ ^(y|Y)$ ]]; then
+	setupjessiearietta
+fi
+if [[ $SETUPFORACQUA =~ ^(y|Y)$ ]]; then
+	setupjessieacqua
+fi
+if [[ $SETUPFORFOX =~ ^(y|Y)$ ]]; then
+	setupjessiefox
+fi
 
 #exit from multistrap Jessie
 cd ..
@@ -420,29 +661,85 @@ cd ..
 cd ..
 }
 
+function setupbootloader {
+echo
+echo
+echo "6/6: Setup bootloader"
+echo "-------------------------------------"
+echo
+echo
+echo "$(date)   | Setup bootloader" >> $LOG_FILE
+mkdir bootloader
+cd bootloader
+if [[ $SETUPFORARIA =~ ^(y|Y)$ ]] || [[ $SETUPFORARIETTA =~ ^(y|Y)$ ]] || [[ $SETUPFORACQUA =~ ^(y|Y)$ ]]; then
+#only if ubuntu <=14
+# cat /etc/issue - to be do
+wget https://github.com/linux4sam/at91bootstrap/archive/v3.7.zip
+unzip v3.7.zip
+cd at91bootstrap-3.7
+wget https://raw.githubusercontent.com/AcmeSystems/acmepatches/master/at91bootstrap-3.7.patch
+patch -p1 <  at91bootstrap-3.7.patch
+#exit from at91bootstrap
+cd ..
+cp -R at91bootstrap-3.7 at91bootstrap-3.7-acqua-256m
+cp -R at91bootstrap-3.7 at91bootstrap-3.7-acqua-512m
+cp -R at91bootstrap-3.7 at91bootstrap-3.7-aria-128m
+cp -R at91bootstrap-3.7 at91bootstrap-3.7-aria-256m
+cp -R at91bootstrap-3.7 at91bootstrap-3.7-arietta-128m
+mv    at91bootstrap-3.7 at91bootstrap-3.7-arietta-256m
+fi
+if [[ $SETUPFORFOX =~ ^(y|Y)$ ]]; then
+#acmebot
+mkdir acmebot
+cd acmebot
+wget http://terzo.acmesystems.it/download/acmeboot/pizzica.py
+wget http://terzo.acmesystems.it/download/acmeboot/xmodem.py
+wget http://www.acmesystems.it/www/acmeboot/acmeboot_dataflash_1.22.bin
+wget http://www.acmesystems.it/www/acmeboot/acmeboot_serialflash_1.22.bin
+wget http://terzo.acmesystems.it/download/acmeboot/macaddress.txt
+#exif from acmebot
+cd ..
+fi
+if [ $NEED_ARIABOT -eq 1 ]; then
+#ariabot
+git clone git://github.com/tanzilli/AriaBoot.git
+cd AriaBoot
+make
+#exit from ariabot
+cd ..
+fi
+#exit from bootloader
+cd ..
+}
 
 function theend {
-echo "The End" >> $LOG_FILE
+echo "$(date)   | The End" >> $LOG_FILE
 echo
 echo "The End"
 echo
 }
 
 menu
+selectacmeboards
 validate
 setuppackages
 mkdir bootloader
 mkdir kernel
 mkdir rootfs
-setupbootloader
 setupkernel
 echo
 echo
-echo "5/5: Setup rootfs"
+echo "5/6: Setup rootfs"
 echo "-------------------------------------"
 echo
 echo
-setuprootfswheezy
-setuprootfsjessie
+if [ $KERNEL_SETUP -eq $KERNEL_SETUP_LAST ]; then
+	setuprootfsjessie #last
+else
+#to be do for match working kernel & rootfs
+	setuprootfsjessie #last
+	setuprootfswheezy #old
+fi
+setupbootloader
 theend
 

@@ -27,8 +27,9 @@ The repo is not fully complete yet.
 
 So, let me try
 
-setup.sh <- complete for initial version
+setup.sh 
 ----------
+16/11/2015 under test
 Use it for download, initial setup, but not compile:
 - bootloader
 - kernel + dts + patch
@@ -45,6 +46,6 @@ compile.sh <- work in progress
 Use it for compile the system and prepare all files for the micro sd. 
 The script will ask you what is your target (Acme Systems board name)
 and it will propose what you can choose (as kernel version)
-and it will use the right rootfs that is needed (Jessie / Wheezy)
+and it will use or ask the right rootfs that is needed (Jessie / Wheezy)
 
 
