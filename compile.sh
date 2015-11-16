@@ -70,6 +70,7 @@ elif [ $BOARD -eq $ARIETTAG25256 ];  then
 elif [ $BOARD -eq $FOX ]; then
 	echo "$(date)   | Fox G20 selected" >> $LOG_FILE
 fi
+echo
 echo "Ok."
 sleep 1
 }
@@ -90,39 +91,34 @@ function kernelnotpresent () {
 }
 
 function validatek () {
-VERSION=$1
-	if [ $VERSION -eq $K4_2_6 ] && [ ! -f kernel/linux-4.2.6 ]; then
+	VERSION=$1
+	if [ $VERSION -eq $K4_2_6 ] && [ ! -d kernel/linux-4.2.6 ]; then
 		kernelnotpresent
 		echo "$(date)   | Kernel 4.2.6 is not present on the disk" >> $LOG_FILE
 		exit
-	elif [ $VERSION -eq $K4_1_11 ] && [ ! -f kernel/linux-4.1.11 ]; then
+	elif [ $VERSION -eq $K4_1_11 ] && [ ! -d kernel/linux-4.1.11 ]; then
 		kernelnotpresent
 		echo "$(date)   | Kernel 4.1.11 is not present on the disk" >> $LOG_FILE
 		exit
-	elif [ $VERSION -eq $K3_18_14 ] && [ ! -f kernel/linux-3.18.14 ]; then
+	elif [ $VERSION -eq $K3_18_14 ] && [ ! -d kernel/linux-3.18.14 ]; then
 		kernelnotpresent
 		echo "$(date)   | Kernel 3.18.14 is not present on the disk" >> $LOG_FILE
 		exit
-	elif [ $VERSION -eq $K3_16_1 ] && [ ! -f kernel/linux-3.16.1 ]; then
+	elif [ $VERSION -eq $K3_16_1 ] && [ ! -d kernel/linux-3.16.1 ]; then
 		kernelnotpresent
 		echo "$(date)   | Kernel 3.16.1 is not present on the disk" >> $LOG_FILE
 		exit
-	elif [ $VERSION -eq $K3_10 ] && [ ! -f kernel/linux-3.10 ]; then
+	elif [ $VERSION -eq $K3_10 ] && [ ! -d kernel/linux-3.10 ]; then
 		kernelnotpresent
 		echo "$(date)   | Kernel 3.10 is not present on the disk" >> $LOG_FILE
 		exit
-	elif [ $VERSION -eq $K2_6_39 ] && [ ! -f kernel/linux-2.6.39 ]; then
+	elif [ $VERSION -eq $K2_6_39 ] && [ ! -d kernel/linux-2.6.39 ]; then
 		kernelnotpresent
 		echo "$(date)   | Kernel 2.6.39 is not present on the disk" >> $LOG_FILE
 		exit
-	elif [ $VERSION -eq $K2_6_38 ] && [ ! -f kernel/linux-2.6.38 ]; then
+	elif [ $VERSION -eq $K2_6_38 ] && [ ! -d kernel/linux-2.6.38 ]; then
 		kernelnotpresent
 		echo "$(date)   | Kernel 2.6.38 is not present on the disk" >> $LOG_FILE
-		exit
-	else
-		echo
-		echo "bug"
-		echo
 		exit
 	fi
 }
