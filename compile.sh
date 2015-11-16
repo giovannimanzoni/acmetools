@@ -79,6 +79,7 @@ elif [ $BOARD -eq $FOX ]; then
 fi
 echo
 echo "Ok."
+echo
 sleep 1
 }
 
@@ -140,6 +141,7 @@ if [ $BOARD -eq $ACQUA256 ] || [ $BOARD -eq $ACQUA512 ]; then
 	echo "1: 4.2.6"
 	echo "2: 4.1.11"
 	echo "5: 3.10"
+	echo
 	read -n 1 KERNEL
 	validatek $KERNEL
 	if ! ([ $KERNEL -eq 1 ] || [ $KERNEL -eq 2 ] || [ $KERNEL -eq 5 ]); then
@@ -151,6 +153,7 @@ elif [ $BOARD -eq $ARIAG25128 ] || [ $BOARD -eq $ARIAG25256 ]; then
 	echo "3: 3.18.14"
 	echo "4: 3.16.1"
 	echo "6: 2.6.39"
+	echo
 	read -n 1 KERNEL
 	validatek $KERNEL
 	if ! ([ $KERNEL -eq 1 ] || [ $KERNEL -eq 2 ] || [ $KERNEL -eq 3 ] || [ $KERNEL -eq 4 ] || [ $KERNEL -eq 6 ]); then
@@ -161,6 +164,7 @@ elif [ $BOARD -eq $ARIETTAG25128 ] || [ $BOARD -eq $ARIETTAG25256 ]; then
 	echo "2: 4.1.11"
 	echo "3: 3.18.14"
 	echo "4: 3.16.1"
+	echo
 	read -n 1 KERNEL
 	validatek $KERNEL
 	if ! ([ $KERNEL -eq 1 ] || [ $KERNEL -eq 2 ] || [ $KERNEL -eq 3 ] || [ $KERNEL -eq 4 ]); then
@@ -168,6 +172,7 @@ elif [ $BOARD -eq $ARIETTAG25128 ] || [ $BOARD -eq $ARIETTAG25256 ]; then
 	fi
 elif [ $BOARD -eq $FOX ]; then
 	echo "7: 2.6.38"
+	echo
 	read -n 1 KERNEL
 	validatek $KERNEL
 	if [ $KERNEL -ne 7 ]; then
@@ -209,7 +214,10 @@ elif [ $BOARD -eq $ARIETTAG25128 ]; then
 elif [ $BOARD -eq $ARIETTAG25256 ];  then
 	cd at91bootstrap-3.7-arietta-256m
 	make arietta-256m_defconfig
-elif [ $BOARD -eq $FOX ] && [ $KERNEL -eq $K2_6_38 ]; then
+fi
+
+#above and below if must be separated
+if [ $BOARD -eq $FOX ] && [ $KERNEL -eq $K2_6_38 ]; then
 	cd acmeboot
 	nano cmdline.txt
 	nano macaddress.txt
@@ -350,6 +358,8 @@ function compilekernel {
 		echo "$(date)   | Kernel menu config" >> ../../$LOG_FILE
 		read -n 1 KERNEL_CONFIG
 		echo
+		echo "Ok."
+		echo
 		if [ $KERNEL_CONFIG -eq 1 ]; then
 			rm .config
 			make ARCH=arm mrproper
@@ -443,17 +453,17 @@ function copybootloader {
 	echo
 	sleep 1
 	if [ $BOARD -eq $ACQUA256 ]; then
-		cp bootloader/at91bootstrap-3.7-acqua-256m/binaries/sama5d3_acqua-sdcardboot-linux-zimage-dt-3.7.bin /media/$USER/boot/boot.bin
+		cp bootloader/at91bootstrap-3.7-acqua-256m/binaries/sama5d3_acqua-sdcardboot-linux-zimage-dt-3.7.bin /media/$USER/BOOT/boot.bin
 	elif [ $BOARD -eq $ACQUA512 ]; then
-		cp bootloader/at91bootstrap-3.7-acqua-512m/binaries/sama5d3_acqua-sdcardboot-linux-zimage-dt-3.7.bin /media/$USER/boot/boot.bin
+		cp bootloader/at91bootstrap-3.7-acqua-512m/binaries/sama5d3_acqua-sdcardboot-linux-zimage-dt-3.7.bin /media/$USER/BOOT/boot.bin
 	elif [ $BOARD -eq $ARIAG25128 ]; then
-		cp bootloader/at91bootstrap-3.7-aria-128m/binaries/at91sam9x5_aria-sdcardboot-linux-zimage-dt-3.7.bin /media/$USER/boot/boot.bin
+		cp bootloader/at91bootstrap-3.7-aria-128m/binaries/at91sam9x5_aria-sdcardboot-linux-zimage-dt-3.7.bin /media/$USER/BOOT/boot.bin
 	elif [ $BOARD -eq $ARIAG25256 ]; then
-		cp bootloader/at91bootstrap-3.7-aria-256m/binaries/at91sam9x5_aria-sdcardboot-linux-zimage-dt-3.7.bin /media/$USER/boot/boot.bin
+		cp bootloader/at91bootstrap-3.7-aria-256m/binaries/at91sam9x5_aria-sdcardboot-linux-zimage-dt-3.7.bin /media/$USER/BOOT/boot.bin
 	elif [ $BOARD -eq $ARIETTAG25128 ]; then
-		cp bootloader/at91bootstrap-3.7-arietta-128m/binaries/at91sam9x5_arietta-sdcardboot-linux-zimage-dt-3.7.bin /media/$USER/boot/boot.bin
+		cp bootloader/at91bootstrap-3.7-arietta-128m/binaries/at91sam9x5_arietta-sdcardboot-linux-zimage-dt-3.7.bin /media/$USER/BOOT/boot.bin
 	elif [ $BOARD -eq $ARIETTAG25256 ]; then
-		cp bootloader/at91bootstrap-3.7-arietta-256m/binaries/at91sam9x5_arietta-sdcardboot-linux-zimage-dt-3.7.bin /media/$USER/boot/boot.bin
+		cp bootloader/at91bootstrap-3.7-arietta-256m/binaries/at91sam9x5_arietta-sdcardboot-linux-zimage-dt-3.7.bin /media/$USER/BOOT/boot.bin
 	elif [ $BOARD -eq $FOX ]; then
 		echo
 		echo "Leaving the FOX Board G20 off. Connect the FOX Board G20 debug port using the DPI adapter and check if the usbserial module driver for the DPI chip is correctly installed (typing dmesg in a second shell)"
@@ -518,17 +528,17 @@ function copykernel {
 	fi
 
 	if [ $BOARD -eq $ACQUA256 ] || [ $BOARD -eq $ACQUA512 ]; then
-		cp arch/arm/boot/dts/acme-acqua.dtb /media/$USER/boot/at91-sama5d3_acqua.dtb
-		cp arch/arm/boot/dts/acme-acqua.dts /media/$USER/boot/at91-sama5d3_acqua.dts
+		cp arch/arm/boot/dts/acme-acqua.dtb /media/$USER/BOOT/at91-sama5d3_acqua.dtb
+		cp arch/arm/boot/dts/acme-acqua.dts /media/$USER/BOOT/at91-sama5d3_acqua.dts
 	elif [ $BOARD -eq $ARIAG25128 ] || [ $BOARD -eq $ARIAG25256 ]; then
-		cp arch/arm/boot/dts/acme-aria.dtb /media/$USER/boot/at91-ariag25.dtb
-		cp arch/arm/boot/dts/acme-aria.dts /media/$USER/boot/at91-ariag25.dts
+		cp arch/arm/boot/dts/acme-aria.dtb /media/$USER/BOOT/at91-ariag25.dtb
+		cp arch/arm/boot/dts/acme-aria.dts /media/$USER/BOOT/at91-ariag25.dts
 	elif [ $BOARD -eq $ARIETTAG25128 ] || [ $BOARD -eq $ARIETTAG25256 ]; then
-		cp arch/arm/boot/dts/acme-arietta.dtb /media/$USER/boot/acme-arietta.dtb
-		cp arch/arm/boot/dts/acme-arietta.dts /media/$USER/boot/acme-arietta.dts
+		cp arch/arm/boot/dts/acme-arietta.dtb /media/$USER/BOOT/acme-arietta.dtb
+		cp arch/arm/boot/dts/acme-arietta.dts /media/$USER/BOOT/acme-arietta.dts
 	fi
 
-	cp arch/arm/boot/zImage /media/$USER/boot
+	cp arch/arm/boot/zImage /media/$USER/BOOT
 	sudo rsync -avc modules/lib/. /media/$USER/rootfs/lib/.
 	#exit from this kernel
 	cd ..
@@ -538,7 +548,7 @@ function copykernel {
 
 function umountmemory {
 	sync
-	sudo umount /media/$USER/boot
+	sudo umount /media/$USER/BOOT
 	sudo umount /media/$USER/rootfs
 	sudo umount /media/$USER/data
 }
