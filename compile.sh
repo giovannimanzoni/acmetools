@@ -106,32 +106,26 @@ echo "Compilation of bootloader"
 echo
 echo
 sleep 1
-
+cd bootloader
 if [ $BOARD -eq $ACQUA256 ]; then
-	echo
 	cd at91bootstrap-3.7-acqua-256m
 	make acqua-256m_defconfig
 elif [ $BOARD -eq $ACQUA512 ]; then
-	echo
 	cd at91bootstrap-3.7-acqua-512m
 	make acqua-512m_defconfig
-elif [ $BOARD -eq $ARIAG25128 ]; then
-	echo
+elif [ $BOARD -eq $ARIAG25128 ] && [ $KERNEL -ne $K2_6_39 ]; then
 	cd at91bootstrap-3.7-aria-128m
 	make aria-128m_defconfig
-elif [ $BOARD -eq $ARIAG25256 ]; then
-	echo
+elif [ $BOARD -eq $ARIAG25256 ] && [ $KERNEL -ne $K2_6_39 ]; then
 	cd at91bootstrap-3.7-aria-256m
 	make aria-256m_defconfig
-elif [ $BOARD -eq $ARIETTAG25128 ]; then
-	echo
+elif [ $BOARD -eq $ARIETTAG25128 ] && [ $KERNEL -ne $K2_6_39 ]; then
 	cd at91bootstrap-3.7-arietta-128m
 	make arietta-128m_defconfig
-elif [ $BOARD -eq $ARIETTAG25256 ]; then
-	echo
+elif [ $BOARD -eq $ARIETTAG25256 ] && [ $KERNEL -ne $K2_6_39 ];  then
 	cd at91bootstrap-3.7-arietta-256m
 	make arietta-256m_defconfig
-elif [ $BOARD -eq $FOX ]; then
+elif [ $BOARD -eq $FOX ] && [ $KERNEL -eq $K2_6_38 ]; then
 	echo
 
 else
@@ -152,6 +146,9 @@ else
 	make menuconfig
 	make CROSS_COMPILE=arm-linux-gnueabi-
 fi
+#exit from specific bootloader folder
+cd ..
+#exit from bootloader
 cd ..
 
 }
