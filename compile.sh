@@ -12,6 +12,26 @@
 # Based on work of : Sergio Tanzilli (sergio@tanzilli.com)
 #
 
+LOG_FILE='compile.log'
+POINTER= #function return values
+
+function read_yn {
+        local YN=''
+        until [[ $YN =~ ^(y|n|Y|N)$ ]]; do
+                read -n 1 YN
+                if [[ $YN =~ ^(y|Y)$ ]]; then
+                        echo "-> Yes"
+                elif [[ $YN =~ ^(n|N)$ ]]; then
+                        echo "-> No"
+                else
+                        echo
+                        echo "Please use only y/n/Y/N key"
+                fi
+        done
+        POINTER=$YN
+}
+
+
 #for $BOARD
 readonly ACQUA256=1
 readonly ACQUA512=2
@@ -32,7 +52,7 @@ echo "4: Aria G25 256M"
 echo "5: Arietta G25 128M"
 echo "6: Arietta G25 256M"
 echo "7: Fox G20"
-read BOARD
+read -n 1 BOARD
 echo
 }
 
@@ -54,7 +74,7 @@ if [ $BOARD -eq $ACQUA256 ] || [ $BOARD -eq $ACQUA512 ]; then
 	echo "1: 4.2.6"
 	echo "2: 4.1.11"
 	echo "5: 3.10"
-	read KERNEL
+	read -n 1 KERNEL
 	if [ $KERNEL -eq 1 ] || [ $KERNEL -eq 2 ] || [ $KERNEL -eq 5 ]; then
 		echo "Ok"
 	else
@@ -66,7 +86,7 @@ elif [ $BOARD -eq $ARIAG25128 ] || [ $BOARD -eq $ARIAG25256 ]; then
 	echo "3: 3.18.14"
 	echo "4: 3.16.1"
 	echo "6: 2.6.39"
-	read KERNEL
+	read -n 1 KERNEL
 	if [ $KERNEL -eq 1 ] || [ $KERNEL -eq 2 ] || [ $KERNEL -eq 3 ] || [ $KERNEL -eq 4 ] || [ $KERNEL -eq 6 ]; then
 		echo "Ok"
 	else
@@ -77,7 +97,7 @@ elif [ $BOARD -eq $ARIETTAG25128 ] || [ $BOARD -eq $ARIETTAG25256 ]; then
 	echo "2: 4.1.11"
 	echo "3: 3.18.14"
 	echo "4: 3.16.1"
-	read KERNEL
+	read -n 1 KERNEL
 	if [ $KERNEL -eq 1 ] || [ $KERNEL -eq 2 ] || [ $KERNEL -eq 3 ] || [ $KERNEL -eq 4 ]; then
 		echo "Ok"
 	else
@@ -86,7 +106,7 @@ elif [ $BOARD -eq $ARIETTAG25128 ] || [ $BOARD -eq $ARIETTAG25256 ]; then
 
 elif [ $BOARD -eq $FOX ]; then
 	echo "7: 2.6.38"
-	read KERNEL
+	read -n 1 KERNEL
 	if [ $KERNEL -eq 7 ]; then
 		echo "Ok"
 	else
@@ -125,7 +145,7 @@ elif [ $BOARD -eq $ARIETTAG25128 ] && [ $KERNEL -ne $K2_6_39 ]; then
 elif [ $BOARD -eq $ARIETTAG25256 ] && [ $KERNEL -ne $K2_6_39 ];  then
 	cd at91bootstrap-3.7-arietta-256m
 	make arietta-256m_defconfig
-elif [ $BOARD -eq $FOX ] && [ $KERNEL -eq $K2_6_38 ]; then
+elif [ $BOARD -eq $FOX ] && [ $KERNEL -ne $K2_6_38 ]; then
 	echo
 
 else
@@ -134,7 +154,15 @@ fi
 
 if [ $BOARD -eq $ARIAG25128 ] && [ $KERNEL -eq $K2_6_39 ]; then
 	# http://www.acmesystems.it/ariaboot
+	cd ariabot
+	echo "Now you can change some parameters of bootloader."
+	echo "For 128MB of ram, you have to set CONFIG_LINUX_KERNEL_ARG_STRING to"
+	echo "mem=128M console=ttyS0,115200 noinitrd root=/dev/mmcblk0p2 rw rootwait init=/sbin/init"
+	echo "press any key to open shell editor"
+	read -n 1 KEY
 	echo
+	nano .config
+	make
 elif [ $BOARD -eq $ARIAG25256 ] && [ $KERNEL -eq $K2_6_39 ]; then
 	# http://www.acmesystems.it/ariaboot
 	echo
@@ -169,39 +197,117 @@ function wrong {
 function compilekernel {
 	echo
 	echo
-	echo "Compilation of the kernel"
+	echo "Compiling the kernel"
 	echo
 	echo
 	sleep 1
 
 	if   [ $KERNEL -eq $K4_2_6 ]; then
+		echo
+		echo
+		echo "C O M P I L I N G   T H E   K E R N E L   4 . 2 . 6"
+		echo
+		echo
+		echo "$(date)   | Compiling the kernel 4.2.6" >> $LOG_FILE
 		cd kernel/linux-4.2.6
 	elif [ $KERNEL -eq $K4_1_11 ]; then
+		echo
+		echo
+		echo "C O M P I L I N G   T H E   K E R N E L   4 . 1 . 1 1"
+		echo
+		echo
+		echo "$(date)   | Compiling the kernel 4.1.11" >> $LOG_FILE
 		cd kernel/linux-4.1.11
 	elif [ $KERNEL -eq $K3_18_14 ]; then
+		echo
+		echo
+		echo "C O M P I L I N G   T H E   K E R N E L   3 . 1 8 . 1 4"
+		echo
+		echo
+		echo "$(date)   | Compiling the kernel 3.18.14" >> $LOG_FILE
 		cd kernel/linux-3.18.14
 	elif [ $KERNEL -eq $K3_16_1 ]; then
+		echo
+		echo
+		echo "C O M P I L I N G   T H E   K E R N E L   3 . 1 6 . 1"
+		echo
+		echo
+		echo "$(date)   | Compiling the  kernel 3.16.1" >> $LOG_FILE
 		cd kernel/linux-3.16.1
 	elif [ $KERNEL -eq $K3_10 ]; then
+		echo
+		echo
+		echo "C O M P I L I N G   T H E   K E R N E L   3 . 1 0"
+		echo
+		echo
+		echo "$(date)   | Compiling the  kernel 3.10" >> $LOG_FILE
 		cd kernel/linux-3.10
 	elif [ $KERNEL -eq $K2_6_39 ]; then
+		echo
+		echo
+		echo "C O M P I L I N G   T H E   K E R N E L   2 . 6 . 3 9"
+		echo
+		echo
+		echo "$(date)   | Compiling the  kernel 2.6.39" >> $LOG_FILE
 		cd kernel/linux-2.6.39
 	elif [ $KERNEL -eq $K2_6_38 ]; then
-		cd kernel/linux-2.6.38
+		echo
+		echo
+		echo "C O M P I L I N G   T H E   K E R N E L   2 . 6 . 3 8"
+		echo
+		echo
+		echo "$(date)   | Compiling the kernel 2.6.38" >> $LOG_FILE
+		cd kernel/foxg20-linux-2.6.38
 	else
 		wrong
 	fi
 
-	make ARCH=arm menuconfig
-
-	if [ $BOARD -eq $FOX ]; then
-		make -j8 ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- uImage
-	else
-		make -j8 ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- zImage
+	#manage .config
+	#delete .config
+	if [ -f .config ]; then
+		echo
+		echo "Would you like to delete current kernel configuration (.config file) and make default ? [y/n/Y/N]"
+		echo
+		read_yn; DELETE_CONFIG=$POINTER
+		if [[ $DELETE_CONFIG =~ ^(y|Y)$ ]]; then
+			rm .config
+		fi
+	fi
+	#if not exist, create from default
+	if [ ! -f .config ]; then
+		echo
+		echo "Create default config file"
+		echo
+		echo "$(date)   | Create default config file" >> ../../$LOG_FILE
+		if [ $BOARD -eq $ARIETTAG25128 ] || [ $BOARD -eq $ARIETTAG25256 ]  ; then
+			make ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- acme-arietta_defconfig
+		if [ $BOARD -eq $ARIAG25128 ] || [ $BOARD -eq $ARIAG25256 ]  ; then
+			make ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- acme-aria_defconfig
+		if [ $BOARD -eq $ACQUA256 ] || [ $BOARD -eq $ACQUA512 ]  ; then
+			make ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- acme-acqua_defconfig
+		if [ $BOARD -eq $ARIETTAG25128 ] || [ $BOARD -eq $ARIETTAG25256 ]  ; then
+			make foxg20_defconfig
+		fi
 	fi
 
-	make modules -j8 ARCH=arm CROSS_COMPILE=arm-linux-gnueabi-
-	make modules_install INSTALL_MOD_PATH=./modules ARCH=arm
+	#compile
+	if [ $BOARD -eq $FOX ]; then
+		make menuconfig
+		make -j8
+		make modules -j8
+		rm -rf ./foxg20-modules # for safety
+		make modules_install
+	else
+		make ARCH=arm menuconfig
+		make -j8 ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- zImage
+		make modules -j8 ARCH=arm CROSS_COMPILE=arm-linux-gnueabi-
+		make modules_install INSTALL_MOD_PATH=./modules ARCH=arm
+	fi
+
+	#exit from specific kernel folder
+	cd ..
+	#exit from kernel folder
+	cd ..
 }
 
 function copyfiles {
@@ -219,7 +325,7 @@ function copyfiles {
 function copybootloader {
 	echo
 	echo
-	echo "Copy of bootloader on micro sd"
+	echo "Copy the bootloader on the micro sd"
 	echo
 	echo
 	sleep 1
@@ -245,7 +351,7 @@ function copybootloader {
 function copyrootfs {
 	echo
 	echo
-	echo "Copy of bootloader on micro sd"
+	echo "Copy the bootloader on the micro sd"
 	echo
 	echo
 	sleep 1
@@ -260,7 +366,7 @@ function copyrootfs {
 function copykernel {
 	echo
 	echo
-	echo "Copy of kernel on micor sd"
+	echo "Copy the kernel on the micor sd"
 	echo
 	echo
 	sleep 1

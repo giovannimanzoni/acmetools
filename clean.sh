@@ -2,4 +2,5 @@
 rm -rf bootloader/
 rm -rf kernel/
 sudo rm -rf rootfs/
-rm -rf setup.log
+rm  setup.log
+rm  compile.log
