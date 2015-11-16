@@ -53,6 +53,9 @@ echo "5: Arietta G25 128M"
 echo "6: Arietta G25 256M"
 echo "7: Fox G20"
 read -n 1 BOARD
+if ! [[ "$BOARD" =~ ^[1-7]+$ ]]; then
+	wrong
+fi
 echo
 }
 
@@ -279,13 +282,13 @@ function compilekernel {
 		echo "Create default config file"
 		echo
 		echo "$(date)   | Create default config file" >> ../../$LOG_FILE
-		if [ $BOARD -eq $ARIETTAG25128 ] || [ $BOARD -eq $ARIETTAG25256 ]  ; then
+		if [ $BOARD -eq $ARIETTAG25128 ] || [ $BOARD -eq $ARIETTAG25256 ]; then
 			make ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- acme-arietta_defconfig
-		if [ $BOARD -eq $ARIAG25128 ] || [ $BOARD -eq $ARIAG25256 ]  ; then
+		elif [ $BOARD -eq $ARIAG25128 ] || [ $BOARD -eq $ARIAG25256 ]; then
 			make ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- acme-aria_defconfig
-		if [ $BOARD -eq $ACQUA256 ] || [ $BOARD -eq $ACQUA512 ]  ; then
+		elif [ $BOARD -eq $ACQUA256 ] || [ $BOARD -eq $ACQUA512 ]; then
 			make ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- acme-acqua_defconfig
-		if [ $BOARD -eq $ARIETTAG25128 ] || [ $BOARD -eq $ARIETTAG25256 ]  ; then
+		elif [ $BOARD -eq $ARIETTAG25128 ] || [ $BOARD -eq $ARIETTAG25256 ]; then
 			make foxg20_defconfig
 		fi
 	fi
