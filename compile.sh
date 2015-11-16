@@ -55,8 +55,23 @@ echo "7: Fox G20"
 read -n 1 BOARD
 if ! [[ "$BOARD" =~ ^[1-7]+$ ]]; then
 	wrong
+elif [ $BOARD -eq $ACQUA256 ]; then
+	echo "$(date)   | Acqua 256M selected" >> $LOG_FILE
+elif [ $BOARD -eq $ACQUA512 ]; then
+	echo "$(date)   | Acqua 512M selected" >> $LOG_FILE
+elif [ $BOARD -eq $ARIAG25128 ]; then
+	echo "$(date)   | Aria G25 128M selected" >> $LOG_FILE
+elif [ $BOARD -eq $ARIAG25256 ]; then
+	echo "$(date)   | Aria G25 256M selected" >> $LOG_FILE
+elif [ $BOARD -eq $ARIETTAG25128 ]; then
+	echo "$(date)   | Arietta G25 128M selected" >> $LOG_FILE
+elif [ $BOARD -eq $ARIETTAG25256 ];  then
+	echo "$(date)   | Arietta G25 256M selected" >> $LOG_FILE
+elif [ $BOARD -eq $FOX ]; then
+	echo "$(date)   | Fox G20 selected" >> $LOG_FILE
 fi
 echo
+sleep 1
 }
 
 #option for $KERNEL
@@ -119,15 +134,17 @@ else
 	wrong
 fi
 echo
+sleep 1
 }
 
 
 function compilebootloader {
 echo
 echo
-echo "Compilation of bootloader"
+echo "Compiling the bootloader"
 echo
 echo
+echo "$(date)   | Compiling the bootloader" >> $LOG_FILE
 sleep 1
 cd bootloader
 if [ $BOARD -eq $ACQUA256 ]; then
@@ -149,13 +166,10 @@ elif [ $BOARD -eq $ARIETTAG25256 ] && [ $KERNEL -ne $K2_6_39 ];  then
 	cd at91bootstrap-3.7-arietta-256m
 	make arietta-256m_defconfig
 elif [ $BOARD -eq $FOX ] && [ $KERNEL -ne $K2_6_38 ]; then
-	echo
-
-else
-	wrong
-fi
-
-if [ $BOARD -eq $ARIAG25128 ] && [ $KERNEL -eq $K2_6_39 ]; then
+	nano cmdline.txt
+	nano macaddress.txt
+	#to be do
+elif ([ $BOARD -eq $ARIAG25128 ] || [ $BOARD -eq $ARIAG25256 ]) && [ $KERNEL -eq $K2_6_39 ]; then
 	# http://www.acmesystems.it/ariaboot
 	cd ariabot
 	echo "Now you can change some parameters of bootloader."
@@ -166,8 +180,6 @@ if [ $BOARD -eq $ARIAG25128 ] && [ $KERNEL -eq $K2_6_39 ]; then
 	echo
 	nano .config
 	make
-elif [ $BOARD -eq $ARIAG25256 ] && [ $KERNEL -eq $K2_6_39 ]; then
-	# http://www.acmesystems.it/ariaboot
 	echo
 elif [ $BOARD -eq $FOX ] && [ $KERNEL -eq $K2_6_38 ]; then
 	# http://www.acmesystems.it/acmeboot
@@ -264,6 +276,7 @@ function compilekernel {
 	else
 		wrong
 	fi
+	sleep 1
 
 	#manage .config
 	#delete .config
@@ -274,6 +287,7 @@ function compilekernel {
 		read_yn; DELETE_CONFIG=$POINTER
 		if [[ $DELETE_CONFIG =~ ^(y|Y)$ ]]; then
 			rm .config
+			echo "$(date)   | Delete .config" >> ../../$LOG_FILE
 		fi
 	fi
 	#if not exist, create from default
@@ -292,21 +306,49 @@ function compilekernel {
 			make foxg20_defconfig
 		fi
 	fi
+	sleep 1
 
+	#add under git
+	echo
+	echo
+	echo "add files under git"
+	echo "$(date)   | Add files under git" >> ../../$LOG_FILE
+	git add .
+	git add -f .config
+	git commit -m "update"
+	echo
+	echo
+	sleep 2
 	#compile
 	if [ $BOARD -eq $FOX ]; then
 		make menuconfig
+		sleep 1
 		make -j8
+		echo
+		echo
+		echo
 		make modules -j8
+		echo
+		echo
+		echo
 		rm -rf ./foxg20-modules # for safety
 		make modules_install
 	else
 		make ARCH=arm menuconfig
+		sleep 1
 		make -j8 ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- zImage
+		echo
+		echo
+		echo
 		make modules -j8 ARCH=arm CROSS_COMPILE=arm-linux-gnueabi-
+		echo
+		echo
+		echo
 		make modules_install INSTALL_MOD_PATH=./modules ARCH=arm
 	fi
-
+	echo
+	echo
+	echo
 	#exit from specific kernel folder
 	cd ..
 	#exit from kernel folder

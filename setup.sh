@@ -672,24 +672,32 @@ echo "$(date)   | Setup bootloader" >> $LOG_FILE
 mkdir bootloader
 cd bootloader
 if [[ $SETUPFORARIA =~ ^(y|Y)$ ]] || [[ $SETUPFORARIETTA =~ ^(y|Y)$ ]] || [[ $SETUPFORACQUA =~ ^(y|Y)$ ]]; then
-#only if ubuntu <=14
-# cat /etc/issue - to be do
-wget https://github.com/linux4sam/at91bootstrap/archive/v3.7.zip
-unzip v3.7.zip
-cd at91bootstrap-3.7
-wget https://raw.githubusercontent.com/AcmeSystems/acmepatches/master/at91bootstrap-3.7.patch
-patch -p1 <  at91bootstrap-3.7.patch
-#exit from at91bootstrap
-cd ..
-cp -R at91bootstrap-3.7 at91bootstrap-3.7-acqua-256m
-cp -R at91bootstrap-3.7 at91bootstrap-3.7-acqua-512m
-cp -R at91bootstrap-3.7 at91bootstrap-3.7-aria-128m
-cp -R at91bootstrap-3.7 at91bootstrap-3.7-aria-256m
-cp -R at91bootstrap-3.7 at91bootstrap-3.7-arietta-128m
-mv    at91bootstrap-3.7 at91bootstrap-3.7-arietta-256m
+	#only if ubuntu <=14
+	# cat /etc/issue - to be do
+	echo "$(date)   | Setup at91bootstrap" >> $LOG_FILE
+	wget https://github.com/linux4sam/at91bootstrap/archive/v3.7.zip
+	unzip v3.7.zip
+	cd at91bootstrap-3.7
+	wget https://raw.githubusercontent.com/AcmeSystems/acmepatches/master/at91bootstrap-3.7.patch
+	patch -p1 <  at91bootstrap-3.7.patch
+	#exit from at91bootstrap
+	cd ..
+	if [[ $SETUPFORARIA =~ ^(y|Y)$ ]]; then
+		cp -R at91bootstrap-3.7 at91bootstrap-3.7-aria-128m
+		cp -R at91bootstrap-3.7 at91bootstrap-3.7-aria-256m
+	fi
+	if [[ $SETUPFORARIETTA =~ ^(y|Y)$ ]]; then
+		cp -R at91bootstrap-3.7 at91bootstrap-3.7-arietta-128m
+		cp -R at91bootstrap-3.7 at91bootstrap-3.7-arietta-256m
+	fi
+	if [[ $SETUPFORACQUA =~ ^(y|Y)$ ]]; then
+		cp -R at91bootstrap-3.7 at91bootstrap-3.7-acqua-256m
+		cp -R at91bootstrap-3.7 at91bootstrap-3.7-acqua-512m
+	fi
+	rm -rf at91bootstrap-3.7
 fi
 if [[ $SETUPFORFOX =~ ^(y|Y)$ ]]; then
-#acmebot
+echo "$(date)   | Setup acmebot" >> $LOG_FILE
 mkdir acmebot
 cd acmebot
 wget http://terzo.acmesystems.it/download/acmeboot/pizzica.py
@@ -697,11 +705,16 @@ wget http://terzo.acmesystems.it/download/acmeboot/xmodem.py
 wget http://www.acmesystems.it/www/acmeboot/acmeboot_dataflash_1.22.bin
 wget http://www.acmesystems.it/www/acmeboot/acmeboot_serialflash_1.22.bin
 wget http://terzo.acmesystems.it/download/acmeboot/macaddress.txt
+wget http://www.acmesystems.it/www/troubleshootings/foxg20-script.bin
+touch cmdline.txt
+echo "mem=64M console=ttyS0,115200 noinitrd root=/dev/mmcblk0p2 rw rootwait init=/sbin/init" >> cmdline.txt
+touch  machtype.txt
+echo "3129" >  machtype.txt
 #exif from acmebot
 cd ..
 fi
 if [ $NEED_ARIABOT -eq 1 ]; then
-#ariabot
+echo "$(date)   | Setup ariabot" >> $LOG_FILE
 git clone git://github.com/tanzilli/AriaBoot.git
 cd AriaBoot
 make
