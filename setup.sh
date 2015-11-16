@@ -49,14 +49,14 @@ until [[ $YN =~ ^(y|Y)$   ]]; do
 	read_yn
 	YN=$POINTER
 	if [[ $YN  =~ ^(n|N)$ ]]; then
-		echo "Setup of rootfs with multistrap failed" >> ../../$LOG_FILE
+		echo "Setup of rootfs with multistrap failed" >> ../../../$LOG_FILE
 		sudo umount target-rootfs/dev/
 		echo
 		echo "So, this step will be repeat. Downloaded files will be deleted. Press any key"
 		read -n 1 KEY
 		sudo rm -rf target-rootfs
 	else
-		echo "Setup of rootfs with multistrap Pass" >> ../../$LOG_FILE
+		echo "Setup of rootfs with multistrap Pass" >> ../../../$LOG_FILE
 	fi
 done
 echo
