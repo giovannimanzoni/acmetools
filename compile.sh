@@ -70,7 +70,7 @@ elif [ $BOARD -eq $ARIETTAG25256 ];  then
 elif [ $BOARD -eq $FOX ]; then
 	echo "$(date)   | Fox G20 selected" >> $LOG_FILE
 fi
-echo
+echo "Ok."
 sleep 1
 }
 
@@ -139,9 +139,7 @@ if [ $BOARD -eq $ACQUA256 ] || [ $BOARD -eq $ACQUA512 ]; then
 	echo "5: 3.10"
 	read -n 1 KERNEL
 	validatek $KERNEL
-	if [ $KERNEL -eq 1 ] || [ $KERNEL -eq 2 ] || [ $KERNEL -eq 5 ]; then
-		echo "Ok"
-	else
+	if ! ([ $KERNEL -eq 1 ] || [ $KERNEL -eq 2 ] || [ $KERNEL -eq 5 ]); then
 		wrong
 	fi
 elif [ $BOARD -eq $ARIAG25128 ] || [ $BOARD -eq $ARIAG25256 ]; then
@@ -152,9 +150,7 @@ elif [ $BOARD -eq $ARIAG25128 ] || [ $BOARD -eq $ARIAG25256 ]; then
 	echo "6: 2.6.39"
 	read -n 1 KERNEL
 	validatek $KERNEL
-	if [ $KERNEL -eq 1 ] || [ $KERNEL -eq 2 ] || [ $KERNEL -eq 3 ] || [ $KERNEL -eq 4 ] || [ $KERNEL -eq 6 ]; then
-		echo "Ok"
-	else
+	if ! ([ $KERNEL -eq 1 ] || [ $KERNEL -eq 2 ] || [ $KERNEL -eq 3 ] || [ $KERNEL -eq 4 ] || [ $KERNEL -eq 6 ]); then
 		wrong
 	fi
 elif [ $BOARD -eq $ARIETTAG25128 ] || [ $BOARD -eq $ARIETTAG25256 ]; then
@@ -164,25 +160,21 @@ elif [ $BOARD -eq $ARIETTAG25128 ] || [ $BOARD -eq $ARIETTAG25256 ]; then
 	echo "4: 3.16.1"
 	read -n 1 KERNEL
 	validatek $KERNEL
-	if [ $KERNEL -eq 1 ] || [ $KERNEL -eq 2 ] || [ $KERNEL -eq 3 ] || [ $KERNEL -eq 4 ]; then
-		echo "Ok"
-	else
+	if ! ([ $KERNEL -eq 1 ] || [ $KERNEL -eq 2 ] || [ $KERNEL -eq 3 ] || [ $KERNEL -eq 4 ]); then
 		wrong
 	fi
-
 elif [ $BOARD -eq $FOX ]; then
 	echo "7: 2.6.38"
 	read -n 1 KERNEL
 	validatek $KERNEL
-	if [ $KERNEL -eq 7 ]; then
-		echo "Ok"
-	else
+	if [ $KERNEL -ne 7 ]; then
 		wrong
 	fi
 else
 	wrong
 fi
 echo
+echo "Ok."
 sleep 1
 }
 
@@ -208,22 +200,26 @@ elif [ $BOARD -eq $ARIAG25128 ] && [ $KERNEL -ne $K2_6_39 ]; then
 elif [ $BOARD -eq $ARIAG25256 ] && [ $KERNEL -ne $K2_6_39 ]; then
 	cd at91bootstrap-3.7-aria-256m
 	make aria-256m_defconfig
-elif [ $BOARD -eq $ARIETTAG25128 ] && [ $KERNEL -ne $K2_6_39 ]; then
+elif [ $BOARD -eq $ARIETTAG25128 ]; then
 	cd at91bootstrap-3.7-arietta-128m
 	make arietta-128m_defconfig
-elif [ $BOARD -eq $ARIETTAG25256 ] && [ $KERNEL -ne $K2_6_39 ];  then
+elif [ $BOARD -eq $ARIETTAG25256 ];  then
 	cd at91bootstrap-3.7-arietta-256m
 	make arietta-256m_defconfig
-elif [ $BOARD -eq $FOX ] && [ $KERNEL -ne $K2_6_38 ]; then
+elif [ $BOARD -eq $FOX ] && [ $KERNEL -eq $K2_6_38 ]; then
 	cd acmeboot
 	nano cmdline.txt
 	nano macaddress.txt
 elif ([ $BOARD -eq $ARIAG25128 ] || [ $BOARD -eq $ARIAG25256 ]) && [ $KERNEL -eq $K2_6_39 ]; then
 	cd AriaBoot
 	echo "Now you can change some parameters of bootloader."
+	echo
 	echo "For 128MB of ram, you have to set CONFIG_LINUX_KERNEL_ARG_STRING to"
 	echo "mem=128M console=ttyS0,115200 noinitrd root=/dev/mmcblk0p2 rw rootwait init=/sbin/init"
-	echo "press any key to open shell editor"
+	echo "For 256MB of ram, you have to set CONFIG_LINUX_KERNEL_ARG_STRING to"
+	echo "mem=256M console=ttyS0,115200 noinitrd root=/dev/mmcblk0p2 rw rootwait init=/sbin/init"
+	echo
+	echo "Please press any key to open shell editor"
 	read -n 1 KEY
 	echo
 	nano .config
@@ -459,7 +455,7 @@ function copybootloader {
 function copyrootfs {
 	echo
 	echo
-	echo "Copy the bootloader on the micro sd"
+	echo "Copy the root file system on the micro sd"
 	echo
 	echo
 	sleep 1
@@ -525,7 +521,7 @@ function umountmemory {
 
 function bootloadernotpresent () {
 	echo
-	echo "This kernel is not present on disk"
+	echo "This bootloader is not present on the disk"
 	echo
 	exit
 }
@@ -533,31 +529,31 @@ function bootloadernotpresent () {
 #validate bootloader by match with kernel & board
 function validateb () {
 	if [ $BOARD -eq $ACQUA256 ]; then
-		if [ ! -f  bootloader/at91bootstrap-3.7-acqua-256m ]; then
+		if [ ! -d  bootloader/at91bootstrap-3.7-acqua-256m ]; then
 			boootloadernotpresent
 		fi
 	elif [ $BOARD -eq $ACQUA512 ]; then
-		if [ ! -f  bootloader/at91bootstrap-3.7-acqua-512m ]; then
+		if [ ! -d  bootloader/at91bootstrap-3.7-acqua-512m ]; then
 			boootloadernotpresent
 		fi
-	elif [ $BOARD -eq $ARIAG25128 ]; then
-		if [ ! -f  bootloader/at91bootstrap-3.7-aria-128m ]; then
+	elif [ $BOARD -eq $ARIAG25128 ] && [ $KERNEL -ne $K2_6_38 ]; then
+		if [ ! -d  bootloader/at91bootstrap-3.7-aria-128m ]; then
 			boootloadernotpresent
 		fi
 	elif [ $BOARD -eq $ARIAG25256 ]; then
-		if [ ! -f  bootloader/at91bootstrap-3.7-aria-256m ]; then
+		if [ ! -d  bootloader/at91bootstrap-3.7-aria-256m ]; then
 			boootloadernotpresent
 		fi
 	elif [ $BOARD -eq $ARIETTAG25128 ]; then
-		if [ ! -f  bootloader/at91bootstrap-3.7-arietta-128m ]; then
+		if [ ! -d  bootloader/at91bootstrap-3.7-arietta-128m ]; then
 			boootloadernotpresent
 		fi
 	elif [ $BOARD -eq $ARIETTAG25256 ];  then
-		if [ ! -f  bootloader/at91bootstrap-3.7-arietta-256m ]; then
+		if [ ! -d  bootloader/at91bootstrap-3.7-arietta-256m ]; then
 			boootloadernotpresent
 		fi
 	elif [ $BOARD -eq $FOX ]; then
-		if [ ! -f  bootloader/at91bootstrap-3.7-acqua-512m ]; then
+		if [ ! -d  bootloader/at91bootstrap-3.7-acqua-512m ]; then
 			boootloadernotpresent
 		fi
 	fi
