@@ -674,7 +674,7 @@ cd bootloader
 if [[ $SETUPFORARIA =~ ^(y|Y)$ ]] || [[ $SETUPFORARIETTA =~ ^(y|Y)$ ]] || [[ $SETUPFORACQUA =~ ^(y|Y)$ ]]; then
 	#only if ubuntu <=14
 	# cat /etc/issue - to be do
-	echo "$(date)   | Setup at91bootstrap" >> $LOG_FILE
+	echo "$(date)   | Setup at91bootstrap" >> ../$LOG_FILE
 	wget https://github.com/linux4sam/at91bootstrap/archive/v3.7.zip
 	unzip v3.7.zip
 	cd at91bootstrap-3.7
