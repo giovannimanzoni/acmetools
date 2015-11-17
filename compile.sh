@@ -619,31 +619,31 @@ function bootloadernotpresent () {
 function validateb () {
 	if [ $BOARD -eq $ACQUA256 ]; then
 		if [ ! -d  bootloader/at91bootstrap-3.7-acqua-256m ]; then
-			boootloadernotpresent
+			bootloadernotpresent
 		fi
 	elif [ $BOARD -eq $ACQUA512 ]; then
 		if [ ! -d  bootloader/at91bootstrap-3.7-acqua-512m ]; then
-			boootloadernotpresent
+			bootloadernotpresent
 		fi
 	elif [ $BOARD -eq $ARIAG25128 ] && [ $KERNEL -ne $K2_6_38 ]; then
 		if [ ! -d  bootloader/at91bootstrap-3.7-aria-128m ]; then
-			boootloadernotpresent
+			bootloadernotpresent
 		fi
 	elif [ $BOARD -eq $ARIAG25256 ]; then
 		if [ ! -d  bootloader/at91bootstrap-3.7-aria-256m ]; then
-			boootloadernotpresent
+			bootloadernotpresent
 		fi
 	elif [ $BOARD -eq $ARIETTAG25128 ]; then
 		if [ ! -d  bootloader/at91bootstrap-3.7-arietta-128m ]; then
-			boootloadernotpresent
+			bootloadernotpresent
 		fi
 	elif [ $BOARD -eq $ARIETTAG25256 ];  then
 		if [ ! -d  bootloader/at91bootstrap-3.7-arietta-256m ]; then
-			boootloadernotpresent
+			bootloadernotpresent
 		fi
 	elif [ $BOARD -eq $FOX ]; then
 		if [ ! -d  bootloader/at91bootstrap-3.7-acqua-512m ]; then
-			boootloadernotpresent
+			bootloadernotpresent
 		fi
 	fi
 }
