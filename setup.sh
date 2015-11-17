@@ -92,6 +92,7 @@ echo
 echo "P R E S S     A N Y     K E Y     T O     S T A R T"
 echo
 read -n 1 KEY
+echo
 touch $LOG_FILE
 echo "==============================" >> $LOG_FILE
 echo "$(date)   | S T A R T" >> $LOG_FILE
@@ -302,7 +303,7 @@ echo "1: Only last kernel"
 echo "2: All kernel tested by Acme Systems"
 echo "3: Ask 1-by-1 if download and configure or skip"
 read -n 1 KERNEL_SETUP
-
+echo
 cd kernel
 
 if  [[ $SETUPFORARIA =~ ^(y|Y)$ ]] || [[ $SETUPFORARIETTA =~ ^(y|Y)$ ]] || [[ $SETUPFORACQUA =~ ^(y|Y)$ ]]; then
@@ -340,14 +341,22 @@ echo
 echo "S E T U P   K E R N E L   4 . 2 . 6"
 echo
 echo
-echo "$(date)   | Setup kernel 4.2.6" >> ../$LOG_FILE
-wget https://www.kernel.org/pub/linux/kernel/v4.x/linux-4.2.6.tar.xz
-tar xvfJ linux-4.2.6.tar.xz
-cd linux-4.2.6
-addtogit
-wget https://raw.githubusercontent.com/AcmeSystems/acmepatches/master/linux-4.2.6.patch
-patch -p1 < linux-4.2.6.patch
-cd ..
+if [ ! -d linux-4.2.6 ]; then
+	echo "$(date)   | Setup kernel 4.2.6" >> ../$LOG_FILE
+	if [ ! -f linux-4.2.6.tar.xz ]; then
+		wget https://www.kernel.org/pub/linux/kernel/v4.x/linux-4.2.6.tar.xz
+	fi
+	tar xvfJ linux-4.2.6.tar.xz
+	cd linux-4.2.6
+	addtogit
+	wget https://raw.githubusercontent.com/AcmeSystems/acmepatches/master/linux-4.2.6.patch
+	patch -p1 < linux-4.2.6.patch
+	cd ..
+else
+	echo "Setup kernel 4.2.6 done in the past"
+	echo
+	echo "$(date)   | Setup kernel 4.2.6 done in the past" >> ../$LOG_FILE
+fi
 }
 
 function setup4_1_11 {
@@ -356,14 +365,22 @@ echo
 echo "S E T U P   K E R N E L   4 . 1 . 1 1"
 echo
 echo
-echo "$(date)   | Setup kernel 4.1.11" >> ../$LOG_FILE
-wget https://www.kernel.org/pub/linux/kernel/v4.x/linux-4.1.11.tar.xz
-tar xvfJ linux-4.1.11.tar.xz
-cd linux-4.1.11
-addtogit
-wget https://raw.githubusercontent.com/AcmeSystems/acmepatches/master/linux-4.1.11.patch
-patch -p1 < linux-4.1.11.patch
-cd ..
+if [ ! -d linux-4.1.11 ]; then
+	echo "$(date)   | Setup kernel 4.1.11" >> ../$LOG_FILE
+	if [ ! -f linux-4.1.11.tar.xz ]; then
+		wget https://www.kernel.org/pub/linux/kernel/v4.x/linux-4.1.11.tar.xz
+	fi
+	tar xvfJ linux-4.1.11.tar.xz
+	cd linux-4.1.11
+	addtogit
+	wget https://raw.githubusercontent.com/AcmeSystems/acmepatches/master/linux-4.1.11.patch
+	patch -p1 < linux-4.1.11.patch
+	cd ..
+else
+	echo "Setup kernel 4.1.11 done in the past"
+	echo
+	echo "$(date)   | Setup kernel 4.1.11 done in the past" >> ../$LOG_FILE
+fi
 }
 
 function setup3_18_14 {
@@ -372,19 +389,27 @@ echo
 echo "S E T U P   K E R N E L   3 . 1 8 . 1 4"
 echo
 echo
-echo "$(date)   | Setup kernel 3.18.14" >> ../$LOG_FILE
-wget https://www.kernel.org/pub/linux/kernel/v3.x/linux-3.18.14.tar.xz
-tar xvfJ linux-3.18.14.tar.xz
-cd linux-3.18.14
-addtogit
-wget http://www.acmesystems.it/www/compile_linux_3_18/acme-arietta_defconfig
-wget http://www.acmesystems.it/www/compile_linux_3_18/acme-aria_defconfig
-mv acme-arietta_defconfig arch/arm/configs/
-mv acme-aria_defconfig arch/arm/configs/
-wget http://www.acmesystems.it/www/compile_linux_3_18/acme-arietta.dts
-wget http://www.acmesystems.it/www/compile_linux_3_18/acme-aria.dts
-mv *.dts arch/arm/boot/dts/
-cd ..
+if [ ! -d linux-3.18.14 ]; then
+	echo "$(date)   | Setup kernel 3.18.14" >> ../$LOG_FILE
+	if [ ! -f linux-3.18.14.tar.xz ]; then
+		wget https://www.kernel.org/pub/linux/kernel/v3.x/linux-3.18.14.tar.xz
+	fi
+	tar xvfJ linux-3.18.14.tar.xz
+	cd linux-3.18.14
+	addtogit
+	wget http://www.acmesystems.it/www/compile_linux_3_18/acme-arietta_defconfig
+	wget http://www.acmesystems.it/www/compile_linux_3_18/acme-aria_defconfig
+	mv acme-arietta_defconfig arch/arm/configs/
+	mv acme-aria_defconfig arch/arm/configs/
+	wget http://www.acmesystems.it/www/compile_linux_3_18/acme-arietta.dts
+	wget http://www.acmesystems.it/www/compile_linux_3_18/acme-aria.dts
+	mv *.dts arch/arm/boot/dts/
+	cd ..
+else
+	echo "Setup kernel 3.18.14 done in the past"
+	echo
+	echo "$(date)   | Setup kernel 3.18.14 done in the past" >> ../$LOG_FILE
+fi
 }
 
 function setup3_16_1 {
@@ -393,19 +418,27 @@ echo
 echo "S E T U P   K E R N E L   3 . 1 6 . 1"
 echo
 echo
-echo "$(date)   | Setup kernel 3.16.1" >> ../$LOG_FILE
-wget https://www.kernel.org/pub/linux/kernel/v3.x/linux-3.16.1.tar.xz
-tar xvfJ linux-3.16.1.tar.xz
-cd linux-3.16.1
-addtogit
-wget http://www.acmesystems.it/www/compile_linux_3_16/acme-arietta_defconfig
-wget http://www.acmesystems.it/www/compile_linux_3_16/acme-aria_defconfig
-mv acme-arietta_defconfig arch/arm/configs/
-mv acme-aria_defconfig arch/arm/configs/
-wget http://www.acmesystems.it/www/compile_linux_3_16/acme-aria.dts
-wget http://www.acmesystems.it/www/compile_linux_3_16/acme-arietta.dts
-mv *.dts arch/arm/boot/dts/
-cd ..
+if [ ! -d linux-3.16.1 ]; then
+	echo "$(date)   | Setup kernel 3.16.1" >> ../$LOG_FILE
+	if [ ! -f linux-3.16.1.tar.xz ]; then
+		wget https://www.kernel.org/pub/linux/kernel/v3.x/linux-3.16.1.tar.xz
+	fi
+	tar xvfJ linux-3.16.1.tar.xz
+	cd linux-3.16.1
+	addtogit
+	wget http://www.acmesystems.it/www/compile_linux_3_16/acme-arietta_defconfig
+	wget http://www.acmesystems.it/www/compile_linux_3_16/acme-aria_defconfig
+	mv acme-arietta_defconfig arch/arm/configs/
+	mv acme-aria_defconfig arch/arm/configs/
+	wget http://www.acmesystems.it/www/compile_linux_3_16/acme-aria.dts
+	wget http://www.acmesystems.it/www/compile_linux_3_16/acme-arietta.dts
+	mv *.dts arch/arm/boot/dts/
+	cd ..
+else
+	echo "Setup kernel 3.16.1 done in the past"
+	echo
+	echo "$(date)   | Setup kernel 3.16.1 done in the past" >> ../$LOG_FILE
+fi
 }
 
 function setup3_14_23 {
@@ -414,16 +447,24 @@ echo
 echo "S E T U P   K E R N E L   3 . 1 4 . 2 3"
 echo
 echo
-echo "$(date)   | Setup kernel 3.14.23" >> ../$LOG_FILE
-wget https://www.kernel.org/pub/linux/kernel/v3.x/linux-3.14.23.tar.xz
-tar xvfJ linux-3.14.23.tar.xz
-cd linux-3.14.23
-addtogit
-wget http://www.acmesystems.it/www/compile_linux_3_14/acme-arietta_defconfig
-mv acme-arietta_defconfig arch/arm/configs/
-wget http://www.acmesystems.it/www/compile_linux_3_14/acme-arietta.dts
-mv *.dts arch/arm/boot/dts/
-cd ..
+if [ ! -d linux-3.14.23 ]; then
+	echo "$(date)   | Setup kernel 3.14.23" >> ../$LOG_FILE
+	if [ ! -f linux-3.14.23.tar.xz ]; then
+		wget https://www.kernel.org/pub/linux/kernel/v3.x/linux-3.14.23.tar.xz
+	fi
+	tar xvfJ linux-3.14.23.tar.xz
+	cd linux-3.14.23
+	addtogit
+	wget http://www.acmesystems.it/www/compile_linux_3_14/acme-arietta_defconfig
+	mv acme-arietta_defconfig arch/arm/configs/
+	wget http://www.acmesystems.it/www/compile_linux_3_14/acme-arietta.dts
+	mv *.dts arch/arm/boot/dts/
+	cd ..
+else
+	echo "Setup kernel 3.14.23 done in the past"
+	echo
+	echo "$(date)   | Setup kernel 3.14.23 done in the past" >> ../$LOG_FILE
+fi
 }
 
 function setup3_10 {
@@ -432,22 +473,30 @@ echo
 echo "S E T U P   K E R N E L   3 . 1 0"
 echo
 echo
-echo "$(date)   | Setup kernel 3.10" >> ../$LOG_FILE
-wget https://github.com/linux4sam/linux-at91/archive/linux-3.10-at91.zip
-unzip linux-3.10-at91.zip
-mv linux-at91-linux-3.10-at91 linux-3.10-acqua
-cd linux-3.10-acqua
-addtogit
-wget http://www.acmesystems.it/www/compile_linux_3_10_acqua/acme.patch
-patch -p1 < acme.patch
-wget http://www.acmesystems.it/www/compile_linux_3_10_acqua/acme-acqua_lcd_43.dts
-wget http://www.acmesystems.it/www/compile_linux_3_10_acqua/acme-acqua_lcd_50.dts
-wget http://www.acmesystems.it/www/compile_linux_3_10_acqua/acme-acqua_lcd_70.dts
-wget http://www.acmesystems.it/www/compile_linux_3_10_acqua/acme-acqua_no_lcd.dts
-mv *.dts arch/arm/boot/dts/
-wget http://www.acmesystems.it/www/compile_linux_3_10_acqua/acme-acqua_defconfig
-mv acme-acqua_defconfig arch/arm/configs/
-cd ..
+if [ ! -d linux-3.10 ]; then
+	echo "$(date)   | Setup kernel 3.10" >> ../$LOG_FILE
+	if [ ! -f linux-3.10-at91.zip ]; then
+		wget https://github.com/linux4sam/linux-at91/archive/linux-3.10-at91.zip
+	fi
+	unzip linux-3.10-at91.zip
+	mv linux-at91-linux-3.10-at91 linux-3.10-acqua
+	cd linux-3.10-acqua
+	addtogit
+	wget http://www.acmesystems.it/www/compile_linux_3_10_acqua/acme.patch
+	patch -p1 < acme.patch
+	wget http://www.acmesystems.it/www/compile_linux_3_10_acqua/acme-acqua_lcd_43.dts
+	wget http://www.acmesystems.it/www/compile_linux_3_10_acqua/acme-acqua_lcd_50.dts
+	wget http://www.acmesystems.it/www/compile_linux_3_10_acqua/acme-acqua_lcd_70.dts
+	wget http://www.acmesystems.it/www/compile_linux_3_10_acqua/acme-acqua_no_lcd.dts
+	mv *.dts arch/arm/boot/dts/
+	wget http://www.acmesystems.it/www/compile_linux_3_10_acqua/acme-acqua_defconfig
+	mv acme-acqua_defconfig arch/arm/configs/
+	cd ..
+else
+	echo "Setup kernel 3.10 done in the past"
+	echo
+	echo "$(date)   | Setup kernel 3.10 done in the past" >> ../$LOG_FILE
+fi
 }
 
 function setup2_6_39 {
@@ -456,17 +505,25 @@ echo
 echo "S E T U P   K E R N E L   2 . 6 . 3 9"
 echo
 echo
-echo "$(date)   | Setup kernel 2.6.39" >> ../$LOG_FILE
-wget http://www.kernel.org/pub/linux/kernel/v2.6/linux-2.6.39.tar.bz2
-tar -xvjf linux-2.6.39.tar.bz2
-cd linux-2.6.39
-addtogit
-wget http://www.acmesystems.it/www/ariag25_compile_linux_2_6_39/ariag25.patch.tar.gz
-tar -xvzf ariag25.patch.tar.gz
-patch -p1 < ariag25.patch
-wget http://www.acmesystems.it/www/ariag25_compile_linux_2_6_39/ariag25.config.tar.gz
-tar -xvzf ariag25.config.tar.gz
-cd ..
+if [ ! -d linux-2.6.39 ]; then
+	echo "$(date)   | Setup kernel 2.6.39" >> ../$LOG_FILE
+	if [ ! -f linux-2.6.39.tar.bz2 ]; then
+		wget http://www.kernel.org/pub/linux/kernel/v2.6/linux-2.6.39.tar.bz2
+	fi
+	tar -xvjf linux-2.6.39.tar.bz2
+	cd linux-2.6.39
+	addtogit
+	wget http://www.acmesystems.it/www/ariag25_compile_linux_2_6_39/ariag25.patch.tar.gz
+	tar -xvzf ariag25.patch.tar.gz
+	patch -p1 < ariag25.patch
+	wget http://www.acmesystems.it/www/ariag25_compile_linux_2_6_39/ariag25.config.tar.gz
+	tar -xvzf ariag25.config.tar.gz
+	cd ..
+else
+	echo "Setup kernel 2.6.39 done in the past"
+	echo
+	echo "$(date)   | Setup kernel 2.6.39 done in the past" >> ../$LOG_FILE
+fi
 }
 
 function setup2_6_38 {
@@ -475,12 +532,18 @@ echo
 echo "S E T U P   K E R N E L   2 . 6 . 3 8"
 echo
 echo
-echo "$(date)   | Setup kernel 2.6.38" >> ../$LOG_FILE
-git clone git://github.com/tanzilli/foxg20-linux-2.6.38.git
-cd foxg20-linux-2.6.38
-addtogit
-make foxg20_defconfig
-cd ..
+if [ ! -d foxg20-linux-2.6.38 ]; then
+	echo "$(date)   | Setup kernel 2.6.38" >> ../$LOG_FILE
+	git clone git://github.com/tanzilli/foxg20-linux-2.6.38.git
+	cd foxg20-linux-2.6.38
+	addtogit
+	make foxg20_defconfig
+	cd ..
+else
+	echo "Setup kernel 2.6.38 done in the past"
+	echo
+	echo "$(date)   | Setup kernel 2.6.38 done in the past" >> ../$LOG_FILE
+fi
 }
 
 function setupwheezyaria {
@@ -489,16 +552,22 @@ echo
 echo "S E T U P   W H E E Z Y   R O O T F S   F O R   A R I A   G 2 5"
 echo
 echo
-echo "$(date)   | Setup rootfs Wheezy for AriaG25" >> ../../$LOG_FILE
-mkdir aria
-cd aria
-wget http://www.acmesystems.it/www/debian_wheezy/multistrap_aria.conf
-rootfscommon armel multistrap_aria.conf
-wget http://www.acmesystems.it/www/debian_wheezy/aria.sh
-chmod +x aria.sh
-sudo ./aria.sh
-rootfsend
-cd ..
+if [ ! -d aria ]; then
+	echo "$(date)   | Setup rootfs Wheezy for Aria G25" >> ../../$LOG_FILE
+	mkdir aria
+	cd aria
+	wget http://www.acmesystems.it/www/debian_wheezy/multistrap_aria.conf
+	rootfscommon armel multistrap_aria.conf
+	wget http://www.acmesystems.it/www/debian_wheezy/aria.sh
+	chmod +x aria.sh
+	sudo ./aria.sh
+	rootfsend
+	cd ..
+else
+	echo "Setup rootfs Wheezy for Aria G25 done in the past"
+	echo
+	echo "$(date)   | Setup rootfs Wheezy for Aria G25 done in the past" >> ../../$LOG_FILE
+fi
 }
 
 function setupwheezyarietta {
@@ -507,16 +576,22 @@ echo
 echo "S E T U P   W H E E Z Y   R O O T F S   F O R   A R I E T T A   G 2 5"
 echo
 echo
-echo "$(date)   | Setup rootfs Wheezy for AriettaG25" >> ../../$LOG_FILE
-mkdir arietta
-cd arietta
-wget http://www.acmesystems.it/www/debian_wheezy/multistrap_arietta.conf
-rootfscommon armel multistrap_arietta.conf
-wget http://www.acmesystems.it/www/debian_wheezy/arietta.sh
-chmod +x arietta.sh
-sudo ./arietta.sh
-rootfsend
-cd ..
+if [ ! -d arietta]; then
+	echo "$(date)   | Setup rootfs Wheezy for Arietta G25" >> ../../$LOG_FILE
+	mkdir arietta
+	cd arietta
+	wget http://www.acmesystems.it/www/debian_wheezy/multistrap_arietta.conf
+	rootfscommon armel multistrap_arietta.conf
+	wget http://www.acmesystems.it/www/debian_wheezy/arietta.sh
+	chmod +x arietta.sh
+	sudo ./arietta.sh
+	rootfsend
+	cd ..
+else
+	echo "Setup rootfs Wheezy for Arietta G25 done in the past"
+	echo
+	echo "$(date)   | Setup rootfs Wheezy for Arrietta G25 done in the past" >> ../../$LOG_FILE
+fi
 }
 
 function setupforacqua {
@@ -525,25 +600,32 @@ echo
 echo "S E T U P   W H E E Z Y   R O O T F S   F O R   A C Q U A"
 echo
 echo
-echo "$(date)   | Setup rootfs Wheezy for Acqua" >> ../../$LOG_FILE
-mkdir acqua
-cd acqua
-wget http://www.acmesystems.it/www/debian_wheezy/multistrap_acqua.conf
-rootfscommon armhf multistrap_acqua.conf
-wget http://www.acmesystems.it/www/debian_wheezy/acqua.sh
-chmod +x acqua.sh
-sudo ./acqua.sh
-rootfsend
-cd ..
+if [ ! -d acqua ]; then
+	echo "$(date)   | Setup rootfs Wheezy for Acqua" >> ../../$LOG_FILE
+	mkdir acqua
+	cd acqua
+	wget http://www.acmesystems.it/www/debian_wheezy/multistrap_acqua.conf
+	rootfscommon armhf multistrap_acqua.conf
+	wget http://www.acmesystems.it/www/debian_wheezy/acqua.sh
+	chmod +x acqua.sh
+	sudo ./acqua.sh
+	rootfsend
+	cd ..
+else
+	echo "Setup rootfs Wheezy for Acqua done in the past"
+	echo
+	echo "$(date)   | Setup rootfs Wheezy for Acqua done in the past" >> ../../$LOG_FILE
+fi
 }
 
 function setuprootfswheezy {
 echo "$(date)   | Setup rootfs Wheezy" >> $LOG_FILE
 cd rootfs
 echo "$(date)   | Setup rootfs Wheezy" >> ../$LOG_FILE
-mkdir multistrap_debian_wheezy
+if [ ! -f multistrap_debian_wheezy ]; then
+	mkdir multistrap_debian_wheezy
+fi
 cd multistrap_debian_wheezy
-
 if [[ $SETUPFORARIA =~ ^(y|Y)$ ]]; then
 	setupwheezyaria
 fi
@@ -570,16 +652,22 @@ echo
 echo "S E T U P   J E S S I E   R O O T F S   F O R   A R I A   G 2 5"
 echo
 echo
-echo "$(date)   | Setup rootfs Jessie for AriaG25" >> ../../$LOG_FILE
-mkdir aria
-cd aria
-wget http://www.acmesystems.it/www/debian_jessie/multistrap_aria.conf
-rootfscommon armel multistrap_aria.conf
-wget http://www.acmesystems.it/www/debian_jessie/aria.sh
-chmod +x aria.sh
-sudo ./aria.sh
-rootfsend
-cd ..
+if [ ! -d aria ]; then
+	echo "$(date)   | Setup rootfs Jessie for Aria G25" >> ../../$LOG_FILE
+	mkdir aria
+	cd aria
+	wget http://www.acmesystems.it/www/debian_jessie/multistrap_aria.conf
+	rootfscommon armel multistrap_aria.conf
+	wget http://www.acmesystems.it/www/debian_jessie/aria.sh
+	chmod +x aria.sh
+	sudo ./aria.sh
+	rootfsend
+	cd ..
+else
+	echo "Setup rootfs Jessie for Aria G25 done in the past"
+	echo
+	echo "$(date)   | Setup rootfs Jessie for Aria G25 done in the past" >> ../../$LOG_FILE
+fi
 }
 
 function setupjessiearietta {
@@ -588,16 +676,22 @@ echo
 echo "S E T U P   J E S S I E   R O O T F S   F O R   A R I E T T A   G 2 5"
 echo
 echo
-echo "$(date)   | Setup rootfs Jessie for AriettaG25" >> ../../$LOG_FILEecho
-mkdir arietta
-cd arietta
-wget http://www.acmesystems.it/www/debian_jessie/multistrap_arietta.conf
-rootfscommon armel multistrap_arietta.conf
-wget http://www.acmesystems.it/www/debian_jessie/arietta.sh
-chmod +x arietta.sh
-sudo ./arietta.sh
-rootfsend
-cd ..
+if [ ! -d arietta ]; then
+	echo "$(date)   | Setup rootfs Jessie for Arietta G25" >> ../../$LOG_FILE
+	mkdir arietta
+	cd arietta
+	wget http://www.acmesystems.it/www/debian_jessie/multistrap_arietta.conf
+	rootfscommon armel multistrap_arietta.conf
+	wget http://www.acmesystems.it/www/debian_jessie/arietta.sh
+	chmod +x arietta.sh
+	sudo ./arietta.sh
+	rootfsend
+	cd ..
+else
+	echo "Setup rootfs Jessie for Arietta G25 done in the past"
+	echo
+	echo "$(date)   | Setup rootfs Jessie for Arietta G25 done in the past" >> ../../$LOG_FILE
+fi
 }
 
 function setupjessieacqua {
@@ -606,16 +700,22 @@ echo
 echo "S E T U P   J E S S I E   R O O T F S   F O R   A C Q U A"
 echo
 echo
-echo "$(date)   | Setup rootfs Jessie for Acqua" >> ../../$LOG_FILE
-mkdir acqua
-cd acqua
-wget http://www.acmesystems.it/www/debian_jessie/multistrap_acqua.conf
-rootfscommon armel multistrap_acqua.conf
-wget http://www.acmesystems.it/www/debian_jessie/acqua.sh
-chmod +x acqua.sh
-sudo ./acqua.sh
-rootfsend
-cd ..
+if [ ! -d acqua ]; then
+	echo "$(date)   | Setup rootfs Jessie for Acqua" >> ../../$LOG_FILE
+	mkdir acqua
+	cd acqua
+	wget http://www.acmesystems.it/www/debian_jessie/multistrap_acqua.conf
+	rootfscommon armel multistrap_acqua.conf
+	wget http://www.acmesystems.it/www/debian_jessie/acqua.sh
+	chmod +x acqua.sh
+	sudo ./acqua.sh
+	rootfsend
+	cd ..
+else
+	echo "Setup rootfs Jessie for Acqua done in the past"
+	echo
+	echo "$(date)   | Setup rootfs Jessie for Acqua done in the past" >> ../../$LOG_FILE
+fi
 }
 
 function setupjessiefox {
@@ -624,24 +724,31 @@ echo
 echo "S E T U P   J E S S I E   R O O T F S   F O R   F O X   G 2 0"
 echo
 echo
-echo "$(date)   | Setup rootfs Jessie for FoxG20" >> ../../$LOG_FILE
-mkdir fox
-cd fox
-wget http://www.acmesystems.it/www/debian_jessie/multistrap_fox.conf
-rootfscommon armel multistrap_fox.conf
-wget http://www.acmesystems.it/www/debian_jessie/fox.sh
-chmod +x fox.sh
-sudo ./fox.sh
-rootfsend
-cd ..
+if [ ! -d fox ]; then
+	echo "$(date)   | Setup rootfs Jessie for FoxG20" >> ../../$LOG_FILE
+	mkdir fox
+	cd fox
+	wget http://www.acmesystems.it/www/debian_jessie/multistrap_fox.conf
+	rootfscommon armel multistrap_fox.conf
+	wget http://www.acmesystems.it/www/debian_jessie/fox.sh
+	chmod +x fox.sh
+	sudo ./fox.sh
+	rootfsend
+	cd ..
+else
+	echo "Setup rootfs Jessie for Fox G20 done in the past"
+	echo
+	echo "$(date)   | Setup rootfs Jessie for Fox G20 done in the past" >> ../../$LOG_FILE
+fi
 }
 
 function setuprootfsjessie {
 echo "$(date)   | Setup rootfs Jessie" >> ../$LOG_FILE
 cd rootfs
-mkdir multistrap_debian_jessie
+if [ ! -d multistrap_debian_jessie ]; then
+	mkdir multistrap_debian_jessie
+fi
 cd multistrap_debian_jessie
-
 if [[ $SETUPFORARIA =~ ^(y|Y)$ ]]; then
 	setupjessiearia
 fi
@@ -669,57 +776,80 @@ echo "-------------------------------------"
 echo
 echo
 echo "$(date)   | Setup bootloader" >> $LOG_FILE
-mkdir bootloader
 cd bootloader
 if [[ $SETUPFORARIA =~ ^(y|Y)$ ]] || [[ $SETUPFORARIETTA =~ ^(y|Y)$ ]] || [[ $SETUPFORACQUA =~ ^(y|Y)$ ]]; then
 	#only if ubuntu <=14
 	# cat /etc/issue - to be do
 	echo "$(date)   | Setup at91bootstrap" >> ../$LOG_FILE
-	wget https://github.com/linux4sam/at91bootstrap/archive/v3.7.zip
-	unzip v3.7.zip
-	cd at91bootstrap-3.7
-	wget https://raw.githubusercontent.com/AcmeSystems/acmepatches/master/at91bootstrap-3.7.patch
-	patch -p1 <  at91bootstrap-3.7.patch
-	#exit from at91bootstrap
-	cd ..
+	if [ ! -f v3.7.zip ]; then
+		wget https://github.com/linux4sam/at91bootstrap/archive/v3.7.zip
+	fi
+	if [ ! -d at91bootstrap-3.7 ]; then
+		unzip v3.7.zip
+	fi
+	if [ ! -f at91bootstrap-3.7/.config ]; then
+		cd at91bootstrap-3.7
+		if [ ! -f at91bootstrap-3.7.patch ]; then
+			wget https://raw.githubusercontent.com/AcmeSystems/acmepatches/master/at91bootstrap-3.7.patch
+		fi
+		patch -p1 <  at91bootstrap-3.7.patch
+		#exit from at91bootstrap
+		cd ..
+	fi
 	if [[ $SETUPFORARIA =~ ^(y|Y)$ ]]; then
-		cp -R at91bootstrap-3.7 at91bootstrap-3.7-aria-128m
-		cp -R at91bootstrap-3.7 at91bootstrap-3.7-aria-256m
+		if [ ! -d at91bootstrap-3.7-aria-128m ]; then
+			cp -R at91bootstrap-3.7 at91bootstrap-3.7-aria-128m
+		fi
+		if [ ! -d at91bootstrap-3.7-aria-256m ]; then
+			cp -R at91bootstrap-3.7 at91bootstrap-3.7-aria-256m
+		fi
 	fi
 	if [[ $SETUPFORARIETTA =~ ^(y|Y)$ ]]; then
-		cp -R at91bootstrap-3.7 at91bootstrap-3.7-arietta-128m
-		cp -R at91bootstrap-3.7 at91bootstrap-3.7-arietta-256m
+		if [ ! -d at91bootstrap-3.7-arietta-128m ]; then
+			cp -R at91bootstrap-3.7 at91bootstrap-3.7-arietta-128m
+		fi
+		if [ ! -d at91bootstrap-3.7-arietta-256m ]; then
+			cp -R at91bootstrap-3.7 at91bootstrap-3.7-arietta-256m
+		fi
 	fi
 	if [[ $SETUPFORACQUA =~ ^(y|Y)$ ]]; then
-		cp -R at91bootstrap-3.7 at91bootstrap-3.7-acqua-256m
-		cp -R at91bootstrap-3.7 at91bootstrap-3.7-acqua-512m
+		if [ ! -d at91bootstrap-3.7-acqua-256m ]; then
+			cp -R at91bootstrap-3.7 at91bootstrap-3.7-acqua-256m
+		fi
+		if [ ! -d at91bootstrap-3.7-acqua-512m ]; then
+			cp -R at91bootstrap-3.7 at91bootstrap-3.7-acqua-512m
+		fi
 	fi
 	rm -rf at91bootstrap-3.7
 fi
 if [[ $SETUPFORFOX =~ ^(y|Y)$ ]]; then
-echo "$(date)   | Setup acmeboot" >> $LOG_FILE
-mkdir acmeboot
-cd acmeboot
-wget http://terzo.acmesystems.it/download/acmeboot/pizzica.py
-wget http://terzo.acmesystems.it/download/acmeboot/xmodem.py
-wget http://www.acmesystems.it/www/acmeboot/acmeboot_dataflash_1.22.bin
-wget http://www.acmesystems.it/www/acmeboot/acmeboot_serialflash_1.22.bin
-wget http://terzo.acmesystems.it/download/acmeboot/macaddress.txt
-wget http://www.acmesystems.it/www/troubleshootings/foxg20-script.bin
-touch cmdline.txt
-echo "mem=64M console=ttyS0,115200 noinitrd root=/dev/mmcblk0p2 rw rootwait init=/sbin/init" >> cmdline.txt
-touch  machtype.txt
-echo "3129" >  machtype.txt
-#exif from acmeoboot
-cd ..
+	if [ ! -d acmeboot ]; then
+		echo "$(date)   | Setup acmeboot" >> $LOG_FILE
+		mkdir acmeboot
+		cd acmeboot
+		wget http://terzo.acmesystems.it/download/acmeboot/pizzica.py
+		wget http://terzo.acmesystems.it/download/acmeboot/xmodem.py
+		wget http://www.acmesystems.it/www/acmeboot/acmeboot_dataflash_1.22.bin
+		wget http://www.acmesystems.it/www/acmeboot/acmeboot_serialflash_1.22.bin
+		wget http://terzo.acmesystems.it/download/acmeboot/macaddress.txt
+		wget http://www.acmesystems.it/www/troubleshootings/foxg20-script.bin
+		touch cmdline.txt
+		echo "mem=64M console=ttyS0,115200 noinitrd root=/dev/mmcblk0p2 rw rootwait init=/sbin/init" >> cmdline.txt
+		touch  machtype.txt
+		echo "3129" >  machtype.txt
+		#exif from acmeoboot
+		cd ..
+	fi
 fi
 if [ $NEED_ARIABOOT -eq 1 ]; then
-echo "$(date)   | Setup ariaboot" >> $LOG_FILE
-git clone git://github.com/tanzilli/AriaBoot.git
-cd AriaBoot
-make
-#exit from ariaboot
-cd ..
+	if [ ! -d AriBoot ]; then
+		echo "$(date)   | Setup ariaboot" >> $LOG_FILE
+		git clone git://github.com/tanzilli/AriaBoot.git
+		cd AriaBoot
+		make
+		#exit from ariaboot
+		cd ..
+	fi
 fi
 #exit from bootloader
 cd ..
@@ -736,9 +866,15 @@ menu
 selectacmeboards
 validate
 setuppackages
-mkdir bootloader
-mkdir kernel
-mkdir rootfs
+if [ ! -d bootloader ]; then
+	mkdir bootloader
+fi
+if [ ! -d kernel ]; then
+	mkdir kernel
+fi
+if [ ! -d rootfs ]; then
+	mkdir rootfs
+fi
 setupkernel
 echo
 echo
