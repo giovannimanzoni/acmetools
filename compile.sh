@@ -4,7 +4,7 @@
 # Use this script for compile the system and prepare all files for the micro sd.
 # The script will ask you what is your target (Acme Systems board name)
 # and it will propose what you can choose (as kernel version)
-# and it will use the right rootfs that is needed (Jessie / Wheezy)
+# and it will use the right rootfs that is needed (Debian Jessie / Debian Wheezy)
 #
 # Creative Commons License
 # This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.
@@ -526,8 +526,10 @@ function copyrootfs {
 	echo "Copy the root file system on the micro sd"
 	echo
 	echo
+	echo "$(date)   | Copy rootfs" >> $LOG_FILE
 	sleep 1
 	if [ $KERNEL -eq $K2_6_38 ] || [ $KERNEL -eq $K2_6_39 ] || [ $KERNEL -eq $K3_10 ] || [ $KERNEL -eq $K3_16_1 ] || [ $KERNEL -eq $K3_18_14 ]; then
+		echo "$(date)   | Rootfs with Debian Wheezy" >> $LOG_FILE
 		if [ $BOARD -eq $ACQUA256 ] || [ $BOARD -eq $ACQUA512 ]; then
 			sudo rsync -axHAX --progress rootfs/multistrap_debian_wheezy/acqua/target-rootfs/ /media/$USER/rootfs/
 		elif [ $BOARD -eq $ARIAG25128 ] || [ $BOARD -eq $ARIAG25256 ]; then
@@ -538,11 +540,41 @@ function copyrootfs {
 	else
 		#for newer kernel
 		if [ $BOARD -eq $ACQUA256 ] || [ $BOARD -eq $ACQUA512 ]; then
-			sudo rsync -axHAX --progress rootfs/multistrap_debian_jessie/acqua/target-rootfs/ /media/$USER/rootfs/
+			echo
+			echo "Whould you like use old Debian Wheezy y/n/Y/N ? If no, Debian Jessie will be used"
+			echo
+			read_yn; USE_WHEEZY=$POINTER
+			if [[ $USE_WHEEZY =~ ^(y|Y)$ ]]; then
+				echo "$(date)   | Rootfs with Debian Wheezy" >> $LOG_FILE
+				sudo rsync -axHAX --progress rootfs/multistrap_debian_wheezy/acqua/target-rootfs/ /media/$USER/rootfs/
+			else
+				echo "$(date)   | Rootfs with Debian Jessie" >> $LOG_FILE
+				sudo rsync -axHAX --progress rootfs/multistrap_debian_jessie/acqua/target-rootfs/ /media/$USER/rootfs/
+			fi
 		elif [ $BOARD -eq $ARIAG25128 ] || [ $BOARD -eq $ARIAG25256 ]; then
-			sudo rsync -axHAX --progress rootfs/multistrap_debian_jessie/aria/target-rootfs/ /media/$USER/rootfs/
+			echo
+			echo "Whould you like use old Debian Wheezy y/n/Y/N ? If no, Debian Jessie will be used"
+			echo
+			read_yn; USE_WHEEZY=$POINTER
+			if [[ $USE_WHEEZY =~ ^(y|Y)$ ]]; then
+				echo "$(date)   | Rootfs with Debian Wheezy" >> $LOG_FILE
+				sudo rsync -axHAX --progress rootfs/multistrap_debian_wheezy/aria/target-rootfs/ /media/$USER/rootfs/
+			else
+				echo "$(date)   | Rootfs with Debian Jessie" >> $LOG_FILE
+				sudo rsync -axHAX --progress rootfs/multistrap_debian_jessie/aria/target-rootfs/ /media/$USER/rootfs/
+			fi
 		elif [ $BOARD -eq $ARIETTAG25128 ] || [ $BOARD -eq $ARIETTAG25256 ]; then
-			sudo rsync -axHAX --progress rootfs/multistrap_debian_jessie/arietta/target-rootfs/ /media/$USER/rootfs/
+			echo
+			echo "Whould you like use old Debian Wheezy y/n/Y/N ? If no, Debian Jessie will be used"
+			echo
+			read_yn; USE_WHEEZY=$POINTER
+			if [[ $USE_WHEEZY =~ ^(y|Y)$ ]]; then
+				echo "$(date)   | Rootfs with Debian Wheezy" >> $LOG_FILE
+				sudo rsync -axHAX --progress rootfs/multistrap_debian_wheezy/arietta/target-rootfs/ /media/$USER/rootfs/
+			else
+				echo "$(date)   | Rootfs with Debian Jessie" >> $LOG_FILE
+				sudo rsync -axHAX --progress rootfs/multistrap_debian_jessie/arietta/target-rootfs/ /media/$USER/rootfs/
+			fi
 		fi
 	fi
 }
