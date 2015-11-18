@@ -551,22 +551,42 @@ function compilekernel {
 	echo "Would you like edit the device tree (.dts) ? y/n/Y/N"
 	echo
 	read_yn; DTB_MOD=$POINTER
-	if [ $BOARD -eq $ARIETTAG25128 ] || [ $BOARD -eq $ARIETTAG25256 ]; then
-		if [[ $DTB_MOD =~ ^(y|Y)$ ]]; then
-			nano arch/arm/boot/dts/acme-arietta.dts
+	if [ $KERNEL -eq $K4_1_11 ]; then
+		if [ $BOARD -eq $ARIETTAG25128 ] || [ $BOARD -eq $ARIETTAG25256 ]; then
+			if [[ $DTB_MOD =~ ^(y|Y)$ ]]; then
+				nano arch/arm/boot/dts/acme-arietta-g25.dts
+			fi
+			# do always, small cpu time, absent if make clean on kernel folder
+			make ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- acme-arietta-g25.dtb
+		elif [ $BOARD -eq $ARIAG25128 ] || [ $BOARD -eq $ARIAG25256 ]; then
+			if [[ $DTB_MOD =~ ^(y|Y)$ ]]; then
+				nano arch/arm/boot/dts/acme-aria-g25.dts
+			fi
+			make ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- acme-aria-g25.dtb
+		elif [ $BOARD -eq $ACQUA256 ] || [ $BOARD -eq $ACQUA512 ]; then
+			if [[ $DTB_MOD =~ ^(y|Y)$ ]]; then
+				nano arch/arm/boot/dts/acme-acqua-a5.dts
+			fi
+			make ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- acme-acqua-a5.dtb
 		fi
-		# do always, small cpu time, absent if make clean on kernel folder
-		make ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- acme-arietta.dtb
-	elif [ $BOARD -eq $ARIAG25128 ] || [ $BOARD -eq $ARIAG25256 ]; then
-		if [[ $DTB_MOD =~ ^(y|Y)$ ]]; then
-			nano arch/arm/boot/dts/acme-aria.dts
+	else
+		if [ $BOARD -eq $ARIETTAG25128 ] || [ $BOARD -eq $ARIETTAG25256 ]; then
+			if [[ $DTB_MOD =~ ^(y|Y)$ ]]; then
+				nano arch/arm/boot/dts/acme-arietta.dts
+			fi
+			# do always, small cpu time, absent if make clean on kernel folder
+			make ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- acme-arietta.dtb
+		elif [ $BOARD -eq $ARIAG25128 ] || [ $BOARD -eq $ARIAG25256 ]; then
+			if [[ $DTB_MOD =~ ^(y|Y)$ ]]; then
+				nano arch/arm/boot/dts/acme-aria.dts
+			fi
+			make ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- acme-aria.dtb
+		elif [ $BOARD -eq $ACQUA256 ] || [ $BOARD -eq $ACQUA512 ]; then
+			if [[ $DTB_MOD =~ ^(y|Y)$ ]]; then
+				nano arch/arm/boot/dts/acme-acqua.dts
+			fi
+			make ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- acme-acqua.dtb
 		fi
-		make ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- acme-aria.dtb
-	elif [ $BOARD -eq $ACQUA256 ] || [ $BOARD -eq $ACQUA512 ]; then
-		if [[ $DTB_MOD =~ ^(y|Y)$ ]]; then
-			nano arch/arm/boot/dts/acme-acqua.dts
-		fi
-		make ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- acme-acqua.dtb
 	fi
 	if [[ $DTB_MOD =~ ^(y|Y)$ ]]; then
 		addlog "- Editor for device tree was opened"
