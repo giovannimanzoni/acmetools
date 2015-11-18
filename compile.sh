@@ -469,7 +469,7 @@ function compilekernel {
 			KERNEL_MENU=0
 			if [ $KERNEL_CONFIG -eq 1 ]; then
 				echo
-				echo "Would you modify kernel configuration ?"
+				echo "Would you modify kernel configuration ? y/n/Y/N"
 				echo
 				read_yn; KERNEL_MENU=$POINTER
 			fi
