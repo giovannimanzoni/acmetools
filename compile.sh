@@ -310,7 +310,7 @@ function wrong {
 }
 
 function compilekernel {
-	echo "$(date)   | Kernel" >> ../../$LOG_FILE
+	echo "$(date)   | Kernel" >> $LOG_FILE
 
 	if   [ $KERNEL -eq $K4_2_6 ]; then
 		echo
@@ -375,7 +375,7 @@ function compilekernel {
 
 	#add under git
 	echo
-	echo "- Add files under git for safety"
+	echo "Add files under git for safety"
 	echo
 	echo "$(date)   | - Add files under git for safety" >> ../../$LOG_FILE
 	git add .
@@ -403,9 +403,6 @@ function compilekernel {
 			rm .config
 			echo "$(date)   | - Delete .config" >> ../../$LOG_FILE
 			make ARCH=arm mrproper
-		elif [ $KERNEL_CONFIG -eq 2 ]; then
-			make ARCH=arm clean
-			echo "$(date)   | - Clean generated files in kernel folder but keep kernel configuration (.config)" >> ../../$LOG_FILE
 		# 3 but if .config do not exist !!
 		elif [ $KERNEL_CONFIG -eq 3 ] && [ ! -f .config ]; then
 			echo
@@ -415,12 +412,13 @@ function compilekernel {
 			exit
 		elif [ $KERNEL_CONFIG -eq 3 ] && [ -f .config ]; then
 			echo "$(date)   | - Kernel built in the past" >> ../../$LOG_FILE
-		elif [ $KERNEL_CONFIG -ne 3 ]; then
+		elif [ $KERNEL_CONFIG -ne 2 ]; then
 			echo "$(date)   | - Wrong value ( $KERNEL_CONFIG ) in what to do about kernel configuration" >> ../../$LOG_FILE
 			wrong
 		fi
 	fi
 	#if not exist, create from default
+	local CONFIG_DEFAULT=0
 	if ! [ -f .config ]; then
 		echo
 		echo "Create default config file"
@@ -435,6 +433,7 @@ function compilekernel {
 		elif [ $BOARD -eq $ARIETTAG25128 ] || [ $BOARD -eq $ARIETTAG25256 ]; then
 			make foxg20_defconfig
 		fi
+		CONFIG_DEFAULT=1
 	fi
 	sleep 1
 
@@ -462,13 +461,26 @@ function compilekernel {
 			echo "$(date)   | - Kernel modules install end" >> ../../$LOG_FILE
 		fi
 	else
-		if [ $KERNEL_CONFIG -ne 3 ]; then
+		if [ $KERNEL_CONFIG -ne 3 ]; then # 1 or 2
 			SHA1=$(echo -n .config | sha256sum)
-			make ARCH=arm menuconfig
-			echo "$(date)   | - Kernel menu config was opened for change kernel configuration" >> ../../$LOG_FILE
+			echo
+			echo
+			echo
+			read_yn; KERNEL_MENU=$POINTER
+			if [[ $KERNEL_MENU =~ ^(y|Y)$ ]]; then
+				make ARCH=arm menuconfig
+				echo "$(date)   | - Kernel menu config was opened for change kernel configuration" >> ../../$LOG_FILE
+			fi
 			SHA2=$(echo -n .config | sha256sum)
-			if [ $SHA1 -ne $SHA2 ]; then
-				echo "$(date)   |   - Kernel configuration was changed" >> ../../$LOG_FILE
+			# if .config is changed or is created for first time
+			if ([ $SHA1 -ne $SHA2 ] || [ $CONFIG_DEFAULT -eq 1  ])  ; then
+				if [ $SHA1 -ne $SHA2 ]; then
+					echo "$(date)   |   - Kernel configuration was changed" >> ../../$LOG_FILE
+				fi
+				if [ $KERNEL_CONFIG -eq 2 ]; then
+					make ARCH=arm clean
+					echo "$(date)   |   - Clean generated files in kernel folder but keep kernel configuration (.config)" >> ../../$LOG_FILE
+				fi
 				sleep 1
 				echo "$(date)   |   - Kernel compiling start" >> ../../$LOG_FILE
 				make -j8 ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- zImage
