@@ -416,10 +416,11 @@ function compilekernel {
 			echo "$(date)   | - Wrong value ( $KERNEL_CONFIG ) in what to do about kernel configuration" >> ../../$LOG_FILE
 			wrong
 		fi
-	fi
-	#if not exist, create from default
-	CONFIG_DEF=0
-	if ! [ -f .config ]; then
+		CONFIG_DEF=0 # do not use default config file
+	else
+		KERNEL_CONFIG=1 #make default config file
+		#default config file not exist, create from default
+		CONFIG_DEF=1
 		echo
 		echo "Create default config file"
 		echo
@@ -433,7 +434,6 @@ function compilekernel {
 		elif [ $BOARD -eq $ARIETTAG25128 ] || [ $BOARD -eq $ARIETTAG25256 ]; then
 			make foxg20_defconfig
 		fi
-		CONFIG_DEF=1
 	fi
 	sleep 1
 
