@@ -190,30 +190,48 @@ sleep 1
 function compilebootloader {
 echo
 echo
-echo "Compiling the bootloader"
+echo "Bootloader section"
 echo
 echo
-echo "$(date)   | Compiling the bootloader" >> $LOG_FILE
+echo "$(date)   | Bootloader" >> $LOG_FILE
 sleep 1
 cd bootloader
 if [ $BOARD -eq $ACQUA256 ]; then
 	cd at91bootstrap-3.7-acqua-256m
-	make acqua-256m_defconfig
+	if [ ! -f .config ]; then
+		echo "$(date)   | - Create default configuration" >> ../../$LOG_FILE
+		make acqua-256m_defconfig
+	fi
 elif [ $BOARD -eq $ACQUA512 ]; then
 	cd at91bootstrap-3.7-acqua-512m
-	make acqua-512m_defconfig
+	if [ ! -f .config ]; then
+		echo "$(date)   | - Create default configuration" >> ../../$LOG_FILE
+		make acqua-512m_defconfig
+	fi
 elif [ $BOARD -eq $ARIAG25128 ] && [ $KERNEL -ne $K2_6_39 ]; then
 	cd at91bootstrap-3.7-aria-128m
-	make aria-128m_defconfig
+	if [ ! -f .config ]; then
+		echo "$(date)   | - Create default configuration" >> ../../$LOG_FILE
+		make aria-128m_defconfig
+	fi
 elif [ $BOARD -eq $ARIAG25256 ] && [ $KERNEL -ne $K2_6_39 ]; then
 	cd at91bootstrap-3.7-aria-256m
-	make aria-256m_defconfig
+	if [ ! -f .config ]; then
+		echo "$(date)   | - Create default configuration" >> ../../$LOG_FILE
+		make aria-256m_defconfig
+	fi
 elif [ $BOARD -eq $ARIETTAG25128 ]; then
 	cd at91bootstrap-3.7-arietta-128m
-	make arietta-128m_defconfig
+	if [ ! -f .config ]; then
+		echo "$(date)   | - Create default configuration" >> ../../$LOG_FILE
+		make arietta-128m_defconfig
+	fi
 elif [ $BOARD -eq $ARIETTAG25256 ];  then
 	cd at91bootstrap-3.7-arietta-256m
-	make arietta-256m_defconfig
+	if [ ! -f .config ]; then
+		echo "$(date)   | - Create default configuration" >> ../../$LOG_FILE
+		make arietta-256m_defconfig
+	fi
 fi
 
 #above and below if must be separated
@@ -233,16 +251,42 @@ elif ([ $BOARD -eq $ARIAG25128 ] || [ $BOARD -eq $ARIAG25256 ]) && [ $KERNEL -eq
 	echo "Please press any key to open shell editor"
 	read -n 1 KEY
 	echo
+	SHA1=$(echo -n .config | sha256sum)
 	nano .config
-	make
+	SHA2=$(echo -n .config | sha256sum)
+	if [ $SHA1 -ne $SHA2 ]; then
+		echo "$(date)   | - Create new verson of bootloader" >> ../../$LOG_FILE
+		make
+		echo "$(date)   |   - Creation ok." >> ../../$LOG_FILE
+	else
+		echo "$(date)   | - Booloader configuration has not changed" >> ../../$LOG_FILE
+	fi
 	echo
 elif [ $BOARD -eq $FOX ] && [ $KERNEL -eq $K2_6_38 ]; then
 	cd acmeboot
 	nano macaddress.txt
 else
 	#for all other
-	make menuconfig
-	make CROSS_COMPILE=arm-linux-gnueabi-
+	SHA1=$(echo -n .config | sha256sum)
+	echo
+	echo "Would you edit bootloader configuration ? y/n/Y/N"
+	echo
+	read_yn; EDIT=$POINTER
+	if [[ $EDIT =~ ^(y|Y)$ ]]; then
+		make menuconfig
+		echo "$(date)   | - Menu config was opened." >> ../../$LOG_FILE
+		SHA2=$(echo -n .config | sha256sum)
+		if [ $SHA1 -ne $SHA2 ]; then
+			echo "$(date)   |   - Bootloader configuration is not changed." >> ../../$LOG_FILE
+			echo "$(date)   |     - Compiling start" >> ../../$LOG_FILE
+			make CROSS_COMPILE=arm-linux-gnueabi-
+			echo "$(date)   |     - Compiling end" >> ../../$LOG_FILE
+		else
+			echo "$(date)   |   - But Configuration has not changed." >> ../../$LOG_FILE
+		fi
+	else
+		echo "$(date)   |   - Bootloader configuration has not changed." >> ../../$LOG_FILE
+	fi
 fi
 #exit from specific bootloader folder
 cd ..
@@ -707,4 +751,5 @@ copyfiles
 umountmemory
 cat compile.log
 theend
+
 
