@@ -58,24 +58,25 @@ echo
 touch $LOG_FILE
 echo "==============================" >> $LOG_FILE
 echo "$(date)   | S T A R T" >> $LOG_FILE
+echo "$(date)   | Board" >> $LOG_FILE
 
 read -n 1 BOARD
 if ! [[ "$BOARD" =~ ^[1-7]+$ ]]; then
 	wrong
 elif [ $BOARD -eq $ACQUA256 ]; then
-	echo "$(date)   | Acqua 256M selected" >> $LOG_FILE
+	echo "$(date)   | - Acqua 256M selected" >> $LOG_FILE
 elif [ $BOARD -eq $ACQUA512 ]; then
-	echo "$(date)   | Acqua 512M selected" >> $LOG_FILE
+	echo "$(date)   | - Acqua 512M selected" >> $LOG_FILE
 elif [ $BOARD -eq $ARIAG25128 ]; then
-	echo "$(date)   | Aria G25 128M selected" >> $LOG_FILE
+	echo "$(date)   | - Aria G25 128M selected" >> $LOG_FILE
 elif [ $BOARD -eq $ARIAG25256 ]; then
-	echo "$(date)   | Aria G25 256M selected" >> $LOG_FILE
+	echo "$(date)   | - Aria G25 256M selected" >> $LOG_FILE
 elif [ $BOARD -eq $ARIETTAG25128 ]; then
-	echo "$(date)   | Arietta G25 128M selected" >> $LOG_FILE
+	echo "$(date)   | - Arietta G25 128M selected" >> $LOG_FILE
 elif [ $BOARD -eq $ARIETTAG25256 ];  then
-	echo "$(date)   | Arietta G25 256M selected" >> $LOG_FILE
+	echo "$(date)   | - Arietta G25 256M selected" >> $LOG_FILE
 elif [ $BOARD -eq $FOX ]; then
-	echo "$(date)   | Fox G20 selected" >> $LOG_FILE
+	echo "$(date)   | - Fox G20 selected" >> $LOG_FILE
 fi
 echo
 echo "Ok."
@@ -309,68 +310,63 @@ function wrong {
 }
 
 function compilekernel {
-	echo
-	echo
-	echo "- Compiling the kernel"
-	echo
-	echo
-	sleep 1
+	echo "$(date)   | Kernel" >> ../../$LOG_FILE
 
 	if   [ $KERNEL -eq $K4_2_6 ]; then
 		echo
 		echo
-		echo "C O M P I L I N G   T H E   K E R N E L   4 . 2 . 6"
+		echo "K E R N E L   4 . 2 . 6"
 		echo
 		echo
-		echo "$(date)   | Compiling the kernel 4.2.6" >> $LOG_FILE
+		echo "$(date)   | - Version 4.2.6" >> $LOG_FILE
 		cd kernel/linux-4.2.6
 	elif [ $KERNEL -eq $K4_1_11 ]; then
 		echo
 		echo
-		echo "C O M P I L I N G   T H E   K E R N E L   4 . 1 . 1 1"
+		echo "K E R N E L   4 . 1 . 1 1"
 		echo
 		echo
-		echo "$(date)   | Compiling the kernel 4.1.11" >> $LOG_FILE
+		echo "$(date)   | - Version 4.1.11" >> $LOG_FILE
 		cd kernel/linux-4.1.11
 	elif [ $KERNEL -eq $K3_18_14 ]; then
 		echo
 		echo
-		echo "C O M P I L I N G   T H E   K E R N E L   3 . 1 8 . 1 4"
+		echo "K E R N E L   3 . 1 8 . 1 4"
 		echo
 		echo
-		echo "$(date)   | Compiling the kernel 3.18.14" >> $LOG_FILE
+		echo "$(date)   | - Version 3.18.14" >> $LOG_FILE
 		cd kernel/linux-3.18.14
 	elif [ $KERNEL -eq $K3_16_1 ]; then
 		echo
 		echo
-		echo "C O M P I L I N G   T H E   K E R N E L   3 . 1 6 . 1"
+		echo "K E R N E L   3 . 1 6 . 1"
 		echo
 		echo
-		echo "$(date)   | Compiling the  kernel 3.16.1" >> $LOG_FILE
+		echo "$(date)   | - Version 3.16.1" >> $LOG_FILE
 		cd kernel/linux-3.16.1
 	elif [ $KERNEL -eq $K3_10 ]; then
 		echo
 		echo
-		echo "C O M P I L I N G   T H E   K E R N E L   3 . 1 0"
+		echo "K E R N E L   3 . 1 0"
 		echo
 		echo
-		echo "$(date)   | Compiling the  kernel 3.10" >> $LOG_FILE
+		echo "$(date)   | - Version 3.10" >> $LOG_FILE
 		cd kernel/linux-3.10
 	elif [ $KERNEL -eq $K2_6_39 ]; then
 		echo
 		echo
-		echo "C O M P I L I N G   T H E   K E R N E L   2 . 6 . 3 9"
+		echo "K E R N E L   2 . 6 . 3 9"
 		echo
 		echo
-		echo "$(date)   | Compiling the  kernel 2.6.39" >> $LOG_FILE
+		echo "$(date)   | - Version 2.6.39" >> $LOG_FILE
 		cd kernel/linux-2.6.39
 	elif [ $KERNEL -eq $K2_6_38 ]; then
 		echo
 		echo
-		echo "C O M P I L I N G   T H E   K E R N E L   2 . 6 . 3 8"
+		echo "K E R N E L   2 . 6 . 3 8"
 		echo
 		echo
-		echo "$(date)   | Compiling the kernel 2.6.38" >> $LOG_FILE
+		echo "$(date)   | - Version 2.6.38" >> $LOG_FILE
 		cd kernel/foxg20-linux-2.6.38
 	else
 		wrong
@@ -381,7 +377,7 @@ function compilekernel {
 	echo
 	echo "- Add files under git for safety"
 	echo
-	echo "$(date)   | Add files under git for safety" >> ../../$LOG_FILE
+	echo "$(date)   | - Add files under git for safety" >> ../../$LOG_FILE
 	git add .
 	git add -f .config
 	git commit -m "keep under git for safety"
@@ -403,11 +399,10 @@ function compilekernel {
 		echo
 		echo "Ok."
 		echo
-		echo "$(date)   | Kernel menu config" >> ../../$LOG_FILE
 		if [ $KERNEL_CONFIG -eq 1 ]; then
 			rm .config
-			make ARCH=arm mrproper
 			echo "$(date)   | - Delete .config" >> ../../$LOG_FILE
+			make ARCH=arm mrproper
 		elif [ $KERNEL_CONFIG -eq 2 ]; then
 			make ARCH=arm clean
 			echo "$(date)   | - Clean generated files in kernel folder but keep kernel configuration (.config)" >> ../../$LOG_FILE
@@ -468,24 +463,31 @@ function compilekernel {
 		fi
 	else
 		if [ $KERNEL_CONFIG -ne 3 ]; then
+			SHA1=$(echo -n .config | sha256sum)
 			make ARCH=arm menuconfig
-			echo "$(date)   | - Kernel menuconfig was opened" >> ../../$LOG_FILE
-			sleep 1
-			echo "$(date)   | - Kernel compiling start" >> ../../$LOG_FILE
-			make -j8 ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- zImage
-			echo "$(date)   | - Kernel compiling end" >> ../../$LOG_FILE
-			echo
-			echo
-			echo
-			echo "$(date)   | - Kernel modules compiling start" >> ../../$LOG_FILE
-			make modules -j8 ARCH=arm CROSS_COMPILE=arm-linux-gnueabi-
-			echo "$(date)   | - Kernel modules compiling end" >> ../../$LOG_FILE
-			echo
-			echo
-			echo
-			echo "$(date)   | - Kernel modules install start" >> ../../$LOG_FILE
-			make modules_install INSTALL_MOD_PATH=./modules ARCH=arm
-			echo "$(date)   | - Kernel modules install end" >> ../../$LOG_FILE
+			echo "$(date)   | - Kernel menu config was opened for change kernel configuration" >> ../../$LOG_FILE
+			SHA2=$(echo -n .config | sha256sum)
+			if [ $SHA1 -ne $SHA2 ]; then
+				echo "$(date)   |   - Kernel configuration was changed" >> ../../$LOG_FILE
+				sleep 1
+				echo "$(date)   |   - Kernel compiling start" >> ../../$LOG_FILE
+				make -j8 ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- zImage
+				echo "$(date)   |   - Kernel compiling end" >> ../../$LOG_FILE
+				echo
+				echo
+				echo
+				echo "$(date)   |   - Kernel modules compiling start" >> ../../$LOG_FILE
+				make modules -j8 ARCH=arm CROSS_COMPILE=arm-linux-gnueabi-
+				echo "$(date)   |   - Kernel modules compiling end" >> ../../$LOG_FILE
+				echo
+				echo
+				echo
+				echo "$(date)   |   - Kernel modules install start" >> ../../$LOG_FILE
+				make modules_install INSTALL_MOD_PATH=./modules ARCH=arm
+				echo "$(date)   |   - Kernel modules install end" >> ../../$LOG_FILE
+			else
+				echo "$(date)   |   - But kernel configuration is not changed" >> ../../$LOG_FILE
+			fi
 		fi
 	fi
 
