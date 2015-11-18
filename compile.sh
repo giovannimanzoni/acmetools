@@ -524,6 +524,7 @@ function compilekernel {
 				fi
 				sleep 1
 				addlog "- Kernel compiling start"
+				make -j8 ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- uImage
 				make -j8 ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- zImage
 				addlog "- Kernel compiling end"
 				echo
@@ -764,6 +765,7 @@ function copykernel {
 			cp arch/arm/boot/dts/acme-arietta.dts /media/$USER/BOOT/acme-arietta.dts
 		fi
 	fi
+	cp arch/arm/boot/uImage /media/$USER/BOOT/image.bin #for at91bootloader configured for uImage
 	cp arch/arm/boot/zImage /media/$USER/BOOT
 	sudo rsync -avc modules/lib/. /media/$USER/rootfs/lib/.
 	#exit from this kernel
