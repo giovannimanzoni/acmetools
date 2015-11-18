@@ -267,7 +267,7 @@ function wrong {
 function compilekernel {
 	echo
 	echo
-	echo "Compiling the kernel"
+	echo "- Compiling the kernel"
 	echo
 	echo
 	sleep 1
@@ -335,7 +335,7 @@ function compilekernel {
 
 	#add under git
 	echo
-	echo "Add files under git for safety"
+	echo "- Add files under git for safety"
 	echo
 	echo "$(date)   | Add files under git for safety" >> ../../$LOG_FILE
 	git add .
@@ -355,27 +355,29 @@ function compilekernel {
 		echo "2: modify, so keep .config & clean generated files"
 		echo "3: nothing to do, so do not recompile kernel, already done in the past"
 		echo
-		echo "$(date)   | Kernel menu config" >> ../../$LOG_FILE
 		read -n 1 KERNEL_CONFIG
 		echo
 		echo "Ok."
 		echo
+		echo "$(date)   | Kernel menu config" >> ../../$LOG_FILE
 		if [ $KERNEL_CONFIG -eq 1 ]; then
 			rm .config
 			make ARCH=arm mrproper
-			echo "$(date)   | Delete .config" >> ../../$LOG_FILE
+			echo "$(date)   | - Delete .config" >> ../../$LOG_FILE
 		elif [ $KERNEL_CONFIG -eq 2 ]; then
 			make ARCH=arm clean
-			echo "$(date)   | Clean generated files in kernel folder but keep kernel configuration (.config)" >> ../../$LOG_FILE
+			echo "$(date)   | - Clean generated files in kernel folder but keep kernel configuration (.config)" >> ../../$LOG_FILE
 		# 3 but if .config do not exist !!
 		elif [ $KERNEL_CONFIG -eq 3 ] && [ ! -f .config ]; then
 			echo
 			echo "But .config do not exist, no previous configuration found !"
 			echo
-			echo "$(date)   | Keep previous kernel configuration but it do not exist. Exit" >> ../../$LOG_FILE
+			echo "$(date)   | - Keep previous kernel configuration but it do not exist. Exit" >> ../../$LOG_FILE
 			exit
+		elif [ $KERNEL_CONFIG -eq 3 ] && [ -f .config ]; then
+			echo "$(date)   | - Kernel built in the past" >> ../../$LOG_FILE
 		elif [ $KERNEL_CONFIG -ne 3 ]; then
-			echo "$(date)   | Wrong value ( $KERNEL_CONFIG )" >> ../../$LOG_FILE
+			echo "$(date)   | - Wrong value ( $KERNEL_CONFIG ) in what to do about kernel configuration" >> ../../$LOG_FILE
 			wrong
 		fi
 	fi
@@ -384,7 +386,7 @@ function compilekernel {
 		echo
 		echo "Create default config file"
 		echo
-		echo "$(date)   | Create default config file" >> ../../$LOG_FILE
+		echo "$(date)   | - Create default config file from Acme Systems defconfig" >> ../../$LOG_FILE
 		if [ $BOARD -eq $ARIETTAG25128 ] || [ $BOARD -eq $ARIETTAG25256 ]; then
 			make ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- acme-arietta_defconfig
 		elif [ $BOARD -eq $ARIAG25128 ] || [ $BOARD -eq $ARIAG25256 ]; then
@@ -401,63 +403,74 @@ function compilekernel {
 	if [ $BOARD -eq $FOX ]; then
 		if [ $KERNEL_CONFIG -ne 3 ]; then
 			make menuconfig
+			echo "$(date)   | - Kernel menuconfig was opened" >> ../../$LOG_FILE
 			sleep 1
+			echo "$(date)   | - Kernel compiling start" >> ../../$LOG_FILE
 			make -j8
+			echo "$(date)   | - Kernel compiling end" >> ../../$LOG_FILE
 			echo
 			echo
 			echo
+			echo "$(date)   | - Kernel modules compiling start" >> ../../$LOG_FILE
 			make modules -j8
+			echo "$(date)   | - Kernel modules compiling end" >> ../../$LOG_FILE
 			echo
 			echo
 			echo
 			rm -rf ./foxg20-modules # for safety
+			echo "$(date)   | - Kernel modules install start" >> ../../$LOG_FILE
 			make modules_install
+			echo "$(date)   | - Kernel modules install end" >> ../../$LOG_FILE
 		fi
 	else
 		if [ $KERNEL_CONFIG -ne 3 ]; then
 			make ARCH=arm menuconfig
+			echo "$(date)   | - Kernel menuconfig was opened" >> ../../$LOG_FILE
 			sleep 1
+			echo "$(date)   | - Kernel compiling start" >> ../../$LOG_FILE
 			make -j8 ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- zImage
+			echo "$(date)   | - Kernel compiling end" >> ../../$LOG_FILE
 			echo
 			echo
 			echo
+			echo "$(date)   | - Kernel modules compiling start" >> ../../$LOG_FILE
 			make modules -j8 ARCH=arm CROSS_COMPILE=arm-linux-gnueabi-
+			echo "$(date)   | - Kernel modules compiling end" >> ../../$LOG_FILE
 			echo
 			echo
 			echo
+			echo "$(date)   | - Kernel modules install start" >> ../../$LOG_FILE
 			make modules_install INSTALL_MOD_PATH=./modules ARCH=arm
+			echo "$(date)   | - Kernel modules install end" >> ../../$LOG_FILE
 		fi
 	fi
 
 	#compile dtb
 	echo
-	echo "Would you like modify the device tree (.dts) ? y/n/Y/N"
+	echo "Would you like edit the device tree (.dts) ? y/n/Y/N"
 	echo
 	read_yn; DTB_MOD=$POINTER
 	if [ $BOARD -eq $ARIETTAG25128 ] || [ $BOARD -eq $ARIETTAG25256 ]; then
 		if [[ $DTB_MOD =~ ^(y|Y)$ ]]; then
 			nano arch/arm/boot/dts/acme-arietta.dts
 		fi
-		#if not exist, make it
-		if [ ! -f arch/arm/boot/dts/acme-arietta.dtb ]; then
-			make ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- acme-arietta.dtb
-		fi
+		make ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- acme-arietta.dtb
 	elif [ $BOARD -eq $ARIAG25128 ] || [ $BOARD -eq $ARIAG25256 ]; then
 		if [[ $DTB_MOD =~ ^(y|Y)$ ]]; then
 			nano arch/arm/boot/dts/acme-aria.dts
 		fi
-		if [ ! -f arch/arm/boot/dts/acme-aria.dtb ]; then
-			make ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- acme-aria.dtb
-		fi
+		make ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- acme-aria.dtb
 	elif [ $BOARD -eq $ACQUA256 ] || [ $BOARD -eq $ACQUA512 ]; then
 		if [[ $DTB_MOD =~ ^(y|Y)$ ]]; then
 			nano arch/arm/boot/dts/acme-acqua.dts
 		fi
-		if [ ! -f arch/arm/boot/dts/acme-acqua.dtb ]; then
-			make ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- acme-acqua.dtb
-		fi
+		make ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- acme-acqua.dtb
 	fi
-
+	if [[ $DTB_MOD =~ ^(y|Y)$ ]]; then
+		echo "$(date)   | - Editor for device tree was opened" >> ../../$LOG_FILE
+	else
+		echo "$(date)   | - Device tree was not edited" >> ../../$LOG_FILE
+	fi
 	echo
 	echo
 	echo
@@ -659,6 +672,7 @@ function validateb () {
 		fi
 	elif [ $BOARD -eq $ARIAG25128 ] && [ $KERNEL -ne $K2_6_38 ]; then
 		if [ ! -d  bootloader/at91bootstrap-3.7-aria-128m ]; then
+			echo "fallisce"
 			bootloadernotpresent
 		fi
 	elif [ $BOARD -eq $ARIAG25256 ]; then
@@ -691,5 +705,6 @@ compilebootloader
 compilekernel
 copyfiles
 umountmemory
+cat compile.log
 theend
 
