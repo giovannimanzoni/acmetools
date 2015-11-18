@@ -482,27 +482,32 @@ function compilekernel {
 			if [ "$SHA1" != "$SHA2" ] || [ $CONFIG_DEF -eq 1 ]; then
 				if [ "$SHA1" != "$SHA2" ]; then
 					echo "$(date)   |   - Kernel configuration was changed" >> ../../$LOG_FILE
+				else # SHA1 = SHA2  && $CONFIG_DEF = 1
+					echo
+					echo "Kernel configuration is not changed"
+					echo
+					echo "$(date)   |   - Kernel configuration is not changed" >> ../../$LOG_FILE
 				fi
 				if [ $KERNEL_CONFIG -eq 2 ]; then
 					make ARCH=arm clean
 					echo "$(date)   |   - Clean generated files in kernel folder but keep kernel configuration (.config)" >> ../../$LOG_FILE
 				fi
 				sleep 1
-				echo "$(date)   |   - Kernel compiling start" >> ../../$LOG_FILE
+				echo "$(date)   | - Kernel compiling start" >> ../../$LOG_FILE
 				make -j8 ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- zImage
-				echo "$(date)   |   - Kernel compiling end" >> ../../$LOG_FILE
+				echo "$(date)   | - Kernel compiling end" >> ../../$LOG_FILE
 				echo
 				echo
 				echo
-				echo "$(date)   |   - Kernel modules compiling start" >> ../../$LOG_FILE
+				echo "$(date)   | - Kernel modules compiling start" >> ../../$LOG_FILE
 				make modules -j8 ARCH=arm CROSS_COMPILE=arm-linux-gnueabi-
-				echo "$(date)   |   - Kernel modules compiling end" >> ../../$LOG_FILE
+				echo "$(date)   | - Kernel modules compiling end" >> ../../$LOG_FILE
 				echo
 				echo
 				echo
-				echo "$(date)   |   - Kernel modules install start" >> ../../$LOG_FILE
+				echo "$(date)   | - Kernel modules install start" >> ../../$LOG_FILE
 				make modules_install INSTALL_MOD_PATH=./modules ARCH=arm
-				echo "$(date)   |   - Kernel modules install end" >> ../../$LOG_FILE
+				echo "$(date)   | - Kernel modules install end" >> ../../$LOG_FILE
 			else
 				echo
 				echo "Kernel configuration is not changed"
@@ -607,10 +612,10 @@ function copyrootfs {
 	echo "Copy the root file system on the micro sd"
 	echo
 	echo
-	echo "$(date)   | Copy rootfs" >> $LOG_FILE
+	echo "$(date)   | Rootfs" >> $LOG_FILE
 	sleep 1
 	if [ $KERNEL -eq $K2_6_38 ] || [ $KERNEL -eq $K2_6_39 ] || [ $KERNEL -eq $K3_10 ] || [ $KERNEL -eq $K3_16_1 ] || [ $KERNEL -eq $K3_18_14 ]; then
-		echo "$(date)   | Rootfs with Debian Wheezy" >> $LOG_FILE
+		echo "$(date)   | - Rootfs with Debian Wheezy" >> $LOG_FILE
 		if [ $BOARD -eq $ACQUA256 ] || [ $BOARD -eq $ACQUA512 ]; then
 			sudo rsync -axHAX --progress rootfs/multistrap_debian_wheezy/acqua/target-rootfs/ /media/$USER/rootfs/
 		elif [ $BOARD -eq $ARIAG25128 ] || [ $BOARD -eq $ARIAG25256 ]; then
@@ -626,10 +631,10 @@ function copyrootfs {
 			echo
 			read_yn; USE_WHEEZY=$POINTER
 			if [[ $USE_WHEEZY =~ ^(y|Y)$ ]]; then
-				echo "$(date)   | Rootfs with Debian Wheezy" >> $LOG_FILE
+				echo "$(date)   | - Rootfs with Debian Wheezy" >> $LOG_FILE
 				sudo rsync -axHAX --progress rootfs/multistrap_debian_wheezy/acqua/target-rootfs/ /media/$USER/rootfs/
 			else
-				echo "$(date)   | Rootfs with Debian Jessie" >> $LOG_FILE
+				echo "$(date)   | - Rootfs with Debian Jessie" >> $LOG_FILE
 				sudo rsync -axHAX --progress rootfs/multistrap_debian_jessie/acqua/target-rootfs/ /media/$USER/rootfs/
 			fi
 		elif [ $BOARD -eq $ARIAG25128 ] || [ $BOARD -eq $ARIAG25256 ]; then
@@ -638,10 +643,10 @@ function copyrootfs {
 			echo
 			read_yn; USE_WHEEZY=$POINTER
 			if [[ $USE_WHEEZY =~ ^(y|Y)$ ]]; then
-				echo "$(date)   | Rootfs with Debian Wheezy" >> $LOG_FILE
+				echo "$(date)   | - Rootfs with Debian Wheezy" >> $LOG_FILE
 				sudo rsync -axHAX --progress rootfs/multistrap_debian_wheezy/aria/target-rootfs/ /media/$USER/rootfs/
 			else
-				echo "$(date)   | Rootfs with Debian Jessie" >> $LOG_FILE
+				echo "$(date)   | - Rootfs with Debian Jessie" >> $LOG_FILE
 				sudo rsync -axHAX --progress rootfs/multistrap_debian_jessie/aria/target-rootfs/ /media/$USER/rootfs/
 			fi
 		elif [ $BOARD -eq $ARIETTAG25128 ] || [ $BOARD -eq $ARIETTAG25256 ]; then
@@ -650,10 +655,10 @@ function copyrootfs {
 			echo
 			read_yn; USE_WHEEZY=$POINTER
 			if [[ $USE_WHEEZY =~ ^(y|Y)$ ]]; then
-				echo "$(date)   | Rootfs with Debian Wheezy" >> $LOG_FILE
+				echo "$(date)   | - Rootfs with Debian Wheezy" >> $LOG_FILE
 				sudo rsync -axHAX --progress rootfs/multistrap_debian_wheezy/arietta/target-rootfs/ /media/$USER/rootfs/
 			else
-				echo "$(date)   | Rootfs with Debian Jessie" >> $LOG_FILE
+				echo "$(date)   | - Rootfs with Debian Jessie" >> $LOG_FILE
 				sudo rsync -axHAX --progress rootfs/multistrap_debian_jessie/arietta/target-rootfs/ /media/$USER/rootfs/
 			fi
 		fi
