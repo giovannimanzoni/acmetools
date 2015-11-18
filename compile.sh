@@ -643,8 +643,7 @@ function copyrootfs {
 	echo
 	addlog "Rootfs"
 	sleep 1
-	if [ $KERNEL -eq $K2_6_38 ] || [ $KERNEL -eq $K2_6_39 ] || [ $KERNEL -eq $K3_10 ] || [ $KERNEL -eq $K3_16_1 ]; then
-		#||  [ $KERNEL -eq $K3_18_14 ]; then
+	if [ $KERNEL -eq $K2_6_38 ] || [ $KERNEL -eq $K2_6_39 ] || [ $KERNEL -eq $K3_10 ] || [ $KERNEL -eq $K3_16_1 ] || [ $KERNEL -eq $K3_18_14 ]; then
 		addlog "- Rootfs with Debian Wheezy"
 		if [ $BOARD -eq $ACQUA256 ] || [ $BOARD -eq $ACQUA512 ]; then
 			sudo rsync -axHAX --progress rootfs/multistrap_debian_wheezy/acqua/target-rootfs/ /media/$USER/rootfs/
