@@ -417,8 +417,7 @@ function compilekernel {
 		#check if it is a number
 		checknumber $KERNEL_CONFIG
 		if [ $KERNEL_CONFIG -eq 1 ]; then
-			rm .config
-			addlog "- Delete .config"
+			addlog "- Delete .config and all generated files"
 			make ARCH=arm mrproper
 		# 3 but if .config do not exist !!
 		elif [ $KERNEL_CONFIG -eq 3 ] && [ ! -f .config ]; then
@@ -434,7 +433,9 @@ function compilekernel {
 			wrong
 		fi
 		CONFIG_DEF=0 # do not use default config file
-	else
+	fi
+	# must be two separated if, .config can be deleted if exist  by option 1 above
+	if [ ! -f .config ]; then
 		KERNEL_CONFIG=1 #make default config file
 		#default config file not exist, create from default
 		CONFIG_DEF=1
