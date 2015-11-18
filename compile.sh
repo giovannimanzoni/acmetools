@@ -721,6 +721,7 @@ function copykernel {
 	echo "Copy the kernel on the micor sd"
 	echo
 	echo
+	addlog "- Copy kernel files on the micro sd"
 	sleep 1
 
 	if   [ $KERNEL -eq $K4_2_6 ]; then
@@ -740,18 +741,29 @@ function copykernel {
 	else
 		wrong
 	fi
-
-	if [ $BOARD -eq $ACQUA256 ] || [ $BOARD -eq $ACQUA512 ]; then
-		cp arch/arm/boot/dts/acme-acqua.dtb /media/$USER/BOOT/at91-sama5d3_acqua.dtb
-		cp arch/arm/boot/dts/acme-acqua.dts /media/$USER/BOOT/at91-sama5d3_acqua.dts
-	elif [ $BOARD -eq $ARIAG25128 ] || [ $BOARD -eq $ARIAG25256 ]; then
-		cp arch/arm/boot/dts/acme-aria.dtb /media/$USER/BOOT/at91-ariag25.dtb
-		cp arch/arm/boot/dts/acme-aria.dts /media/$USER/BOOT/at91-ariag25.dts
-	elif [ $BOARD -eq $ARIETTAG25128 ] || [ $BOARD -eq $ARIETTAG25256 ]; then
-		cp arch/arm/boot/dts/acme-arietta.dtb /media/$USER/BOOT/acme-arietta.dtb
-		cp arch/arm/boot/dts/acme-arietta.dts /media/$USER/BOOT/acme-arietta.dts
+	if [ $KERNEL -eq $K4_1_11 ]; then
+		if [ $BOARD -eq $ACQUA256 ] || [ $BOARD -eq $ACQUA512 ]; then
+			cp arch/arm/boot/dts/acme-acqua-a5.dtb /media/$USER/BOOT/at91-sama5d3_acqua.dtb
+			cp arch/arm/boot/dts/acme-acqua-a5.dts /media/$USER/BOOT/at91-sama5d3_acqua.dts
+		elif [ $BOARD -eq $ARIAG25128 ] || [ $BOARD -eq $ARIAG25256 ]; then
+			cp arch/arm/boot/dts/acme-aria-g25.dtb /media/$USER/BOOT/at91-ariag25.dtb
+			cp arch/arm/boot/dts/acme-aria-g25.dts /media/$USER/BOOT/at91-ariag25.dts
+		elif [ $BOARD -eq $ARIETTAG25128 ] || [ $BOARD -eq $ARIETTAG25256 ]; then
+			cp arch/arm/boot/dts/acme-arietta-g25.dtb /media/$USER/BOOT/acme-arietta.dtb
+			cp arch/arm/boot/dts/acme-arietta-g25.dts /media/$USER/BOOT/acme-arietta.dts
+		fi
+	else
+		if [ $BOARD -eq $ACQUA256 ] || [ $BOARD -eq $ACQUA512 ]; then
+			cp arch/arm/boot/dts/acme-acqua.dtb /media/$USER/BOOT/at91-sama5d3_acqua.dtb
+			cp arch/arm/boot/dts/acme-acqua.dts /media/$USER/BOOT/at91-sama5d3_acqua.dts
+		elif [ $BOARD -eq $ARIAG25128 ] || [ $BOARD -eq $ARIAG25256 ]; then
+			cp arch/arm/boot/dts/acme-aria.dtb /media/$USER/BOOT/at91-ariag25.dtb
+			cp arch/arm/boot/dts/acme-aria.dts /media/$USER/BOOT/at91-ariag25.dts
+		elif [ $BOARD -eq $ARIETTAG25128 ] || [ $BOARD -eq $ARIETTAG25256 ]; then
+			cp arch/arm/boot/dts/acme-arietta.dtb /media/$USER/BOOT/acme-arietta.dtb
+			cp arch/arm/boot/dts/acme-arietta.dts /media/$USER/BOOT/acme-arietta.dts
+		fi
 	fi
-
 	cp arch/arm/boot/zImage /media/$USER/BOOT
 	sudo rsync -avc modules/lib/. /media/$USER/rootfs/lib/.
 	#exit from this kernel
