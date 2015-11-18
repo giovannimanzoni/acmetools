@@ -379,7 +379,9 @@ function compilekernel {
 	echo
 	echo "$(date)   | - Add files under git for safety" >> ../../$LOG_FILE
 	git add .
-	git add -f .config
+	if [ -f .config ]; then
+		git add -f .config
+	fi
 	git commit -m "keep under git for safety"
 	echo
 	sleep 2
