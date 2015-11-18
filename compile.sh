@@ -255,7 +255,7 @@ elif ([ $BOARD -eq $ARIAG25128 ] || [ $BOARD -eq $ARIAG25256 ]) && [ $KERNEL -eq
 	SHA1=$(echo -n .config | sha256sum)
 	nano .config
 	SHA2=$(echo -n .config | sha256sum)
-	if [ $SHA1 -ne $SHA2 ]; then
+	if [ "$SHA1" != "$SHA2" ]; then
 		echo "$(date)   | - Create new verson of bootloader" >> ../../$LOG_FILE
 		make
 		echo "$(date)   |   - Creation ok." >> ../../$LOG_FILE
@@ -277,7 +277,7 @@ else
 		make menuconfig
 		echo "$(date)   | - Menu config was opened." >> ../../$LOG_FILE
 		SHA2=$(echo -n .config | sha256sum)
-		if [ $SHA1 -ne $SHA2 ]; then
+		if [ "$SHA1" != "$SHA2" ]; then
 			echo "$(date)   |   - Bootloader configuration is not changed." >> ../../$LOG_FILE
 			echo "$(date)   |     - Compiling start" >> ../../$LOG_FILE
 			make CROSS_COMPILE=arm-linux-gnueabi-
@@ -418,7 +418,7 @@ function compilekernel {
 		fi
 	fi
 	#if not exist, create from default
-	local CONFIG_DEFAULT=0
+	CONFIG_DEF=0
 	if ! [ -f .config ]; then
 		echo
 		echo "Create default config file"
@@ -433,7 +433,7 @@ function compilekernel {
 		elif [ $BOARD -eq $ARIETTAG25128 ] || [ $BOARD -eq $ARIETTAG25256 ]; then
 			make foxg20_defconfig
 		fi
-		CONFIG_DEFAULT=1
+		CONFIG_DEF=1
 	fi
 	sleep 1
 
@@ -462,19 +462,26 @@ function compilekernel {
 		fi
 	else
 		if [ $KERNEL_CONFIG -ne 3 ]; then # 1 or 2
+
 			SHA1=$(echo -n .config | sha256sum)
-			echo
-			echo "Would you modify kernel configuration ?"
-			echo
-			read_yn; KERNEL_MENU=$POINTER
-			if [[ $KERNEL_MENU =~ ^(y|Y)$ ]]; then
+			KERNEL_MENU=0
+			if [ $KERNEL_CONFIG -eq 1 ]; then
+				echo
+				echo "Would you modify kernel configuration ?"
+				echo
+				read_yn; KERNEL_MENU=$POINTER
+			fi
+			if ([[ $KERNEL_MENU =~ ^(y|Y)$ ]] || [ $KERNEL_CONFIG -eq 2 ]); then
 				make ARCH=arm menuconfig
 				echo "$(date)   | - Kernel menu config was opened for change kernel configuration" >> ../../$LOG_FILE
 			fi
 			SHA2=$(echo -n .config | sha256sum)
+			echo "qui"
 			# if .config is changed or is created for first time
-			if ([ $SHA1 -ne $SHA2 ] || [ $CONFIG_DEFAULT -eq 1  ])  ; then
-				if [ $SHA1 -ne $SHA2 ]; then
+			if [ "$SHA1" != "$SHA2" ]; then
+			#|| [ $CONFIG_DEF -eq 1 ]
+			#then
+				if [ "$SHA1" != "$SHA2" ]; then
 					echo "$(date)   |   - Kernel configuration was changed" >> ../../$LOG_FILE
 				fi
 				if [ $KERNEL_CONFIG -eq 2 ]; then
@@ -512,6 +519,7 @@ function compilekernel {
 		if [[ $DTB_MOD =~ ^(y|Y)$ ]]; then
 			nano arch/arm/boot/dts/acme-arietta.dts
 		fi
+		# do always, small cpu time, absent if make clean on kernel folder
 		make ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- acme-arietta.dtb
 	elif [ $BOARD -eq $ARIAG25128 ] || [ $BOARD -eq $ARIAG25256 ]; then
 		if [[ $DTB_MOD =~ ^(y|Y)$ ]]; then
@@ -756,6 +764,7 @@ function validateb () {
 #
 # P R O G R A M
 #
+
 menuboard
 menukernel
 validateb #validate bootloader
