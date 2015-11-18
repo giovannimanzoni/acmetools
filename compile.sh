@@ -464,7 +464,7 @@ function compilekernel {
 		if [ $KERNEL_CONFIG -ne 3 ]; then # 1 or 2
 			SHA1=$(echo -n .config | sha256sum)
 			echo
-			echo
+			echo "Would you modify kernel configuration ?"
 			echo
 			read_yn; KERNEL_MENU=$POINTER
 			if [[ $KERNEL_MENU =~ ^(y|Y)$ ]]; then
