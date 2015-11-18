@@ -12,8 +12,21 @@
 # Based on work of : Sergio Tanzilli (sergio@tanzilli.com)
 #
 
+WORKING_DIR=$(pwd)
 LOG_FILE='compile.log'
 POINTER= #function return values
+
+
+function addlog () {
+	echo "$(date)   | $1" >> $WORKING_DIR/$LOG_FILE
+}
+
+function checknumber () {
+local NUM=$1
+	if ! [ "$NUM" -eq "$NUM" ] 2>/dev/null; then
+		wrong
+	fi
+}
 
 function read_yn {
         local YN=''
@@ -53,30 +66,30 @@ echo "5: Arietta G25 128M"
 echo "6: Arietta G25 256M"
 echo "7: Fox G20"
 echo
-echo "log saved in setup.log"
+echo "log saved in $WORKING_DIR/$LOG_FILE"
 echo
-touch $LOG_FILE
-echo "==============================" >> $LOG_FILE
-echo "$(date)   | S T A R T" >> $LOG_FILE
-echo "$(date)   | Board" >> $LOG_FILE
+touch $WORKING_DIR/$LOG_FILE
+addlog "=============================="
+addlog "S T A R T"
+addlog "Board"
 
 read -n 1 BOARD
 if ! [[ "$BOARD" =~ ^[1-7]+$ ]]; then
 	wrong
 elif [ $BOARD -eq $ACQUA256 ]; then
-	echo "$(date)   | - Acqua 256M selected" >> $LOG_FILE
+	addlog "- Acqua 256M selected"
 elif [ $BOARD -eq $ACQUA512 ]; then
-	echo "$(date)   | - Acqua 512M selected" >> $LOG_FILE
+	addlog "- Acqua 512M selected"
 elif [ $BOARD -eq $ARIAG25128 ]; then
-	echo "$(date)   | - Aria G25 128M selected" >> $LOG_FILE
+	addlog "- Aria G25 128M selected"
 elif [ $BOARD -eq $ARIAG25256 ]; then
-	echo "$(date)   | - Aria G25 256M selected" >> $LOG_FILE
+	addlog "- Aria G25 256M selected"
 elif [ $BOARD -eq $ARIETTAG25128 ]; then
-	echo "$(date)   | - Arietta G25 128M selected" >> $LOG_FILE
+	addlog "- Arietta G25 128M selected"
 elif [ $BOARD -eq $ARIETTAG25256 ];  then
-	echo "$(date)   | - Arietta G25 256M selected" >> $LOG_FILE
+	addlog "- Arietta G25 256M selected"
 elif [ $BOARD -eq $FOX ]; then
-	echo "$(date)   | - Fox G20 selected" >> $LOG_FILE
+	addlog "- Fox G20 selected"
 fi
 echo
 echo "Ok."
@@ -103,31 +116,31 @@ function validatek () {
 	VERSION=$1
 	if [ $VERSION -eq $K4_2_6 ] && [ ! -d kernel/linux-4.2.6 ]; then
 		kernelnotpresent
-		echo "$(date)   | Kernel 4.2.6 is not present on the disk" >> $LOG_FILE
+		addlog "Kernel 4.2.6 is not present on the disk"
 		exit
 	elif [ $VERSION -eq $K4_1_11 ] && [ ! -d kernel/linux-4.1.11 ]; then
 		kernelnotpresent
-		echo "$(date)   | Kernel 4.1.11 is not present on the disk" >> $LOG_FILE
+		addlog "Kernel 4.1.11 is not present on the disk"
 		exit
 	elif [ $VERSION -eq $K3_18_14 ] && [ ! -d kernel/linux-3.18.14 ]; then
 		kernelnotpresent
-		echo "$(date)   | Kernel 3.18.14 is not present on the disk" >> $LOG_FILE
+		addlog "Kernel 3.18.14 is not present on the disk"
 		exit
 	elif [ $VERSION -eq $K3_16_1 ] && [ ! -d kernel/linux-3.16.1 ]; then
 		kernelnotpresent
-		echo "$(date)   | Kernel 3.16.1 is not present on the disk" >> $LOG_FILE
+		addlog "Kernel 3.16.1 is not present on the disk"
 		exit
 	elif [ $VERSION -eq $K3_10 ] && [ ! -d kernel/linux-3.10 ]; then
 		kernelnotpresent
-		echo "$(date)   | Kernel 3.10 is not present on the disk" >> $LOG_FILE
+		addlog "Kernel 3.10 is not present on the disk"
 		exit
 	elif [ $VERSION -eq $K2_6_39 ] && [ ! -d kernel/linux-2.6.39 ]; then
 		kernelnotpresent
-		echo "$(date)   | Kernel 2.6.39 is not present on the disk" >> $LOG_FILE
+		addlog "Kernel 2.6.39 is not present on the disk"
 		exit
 	elif [ $VERSION -eq $K2_6_38 ] && [ ! -d kernel/linux-2.6.38 ]; then
 		kernelnotpresent
-		echo "$(date)   | Kernel 2.6.38 is not present on the disk" >> $LOG_FILE
+		addlog "Kernel 2.6.38 is not present on the disk"
 		exit
 	fi
 }
@@ -194,43 +207,43 @@ echo
 echo "Bootloader section"
 echo
 echo
-echo "$(date)   | Bootloader" >> $LOG_FILE
+addlog "Bootloader"
 sleep 1
 cd bootloader
 if [ $BOARD -eq $ACQUA256 ]; then
 	cd at91bootstrap-3.7-acqua-256m
 	if [ ! -f .config ]; then
-		echo "$(date)   | - Create default configuration" >> ../../$LOG_FILE
+		addlog "- Create default configuration"
 		make acqua-256m_defconfig
 	fi
 elif [ $BOARD -eq $ACQUA512 ]; then
 	cd at91bootstrap-3.7-acqua-512m
 	if [ ! -f .config ]; then
-		echo "$(date)   | - Create default configuration" >> ../../$LOG_FILE
+		addlog "- Create default configuration"
 		make acqua-512m_defconfig
 	fi
 elif [ $BOARD -eq $ARIAG25128 ] && [ $KERNEL -ne $K2_6_39 ]; then
 	cd at91bootstrap-3.7-aria-128m
 	if [ ! -f .config ]; then
-		echo "$(date)   | - Create default configuration" >> ../../$LOG_FILE
+		addlog "- Create default configuration"
 		make aria-128m_defconfig
 	fi
 elif [ $BOARD -eq $ARIAG25256 ] && [ $KERNEL -ne $K2_6_39 ]; then
 	cd at91bootstrap-3.7-aria-256m
 	if [ ! -f .config ]; then
-		echo "$(date)   | - Create default configuration" >> ../../$LOG_FILE
+		addlog "- Create default configuration"
 		make aria-256m_defconfig
 	fi
 elif [ $BOARD -eq $ARIETTAG25128 ]; then
 	cd at91bootstrap-3.7-arietta-128m
 	if [ ! -f .config ]; then
-		echo "$(date)   | - Create default configuration" >> ../../$LOG_FILE
+		addlog "- Create default configuration"
 		make arietta-128m_defconfig
 	fi
 elif [ $BOARD -eq $ARIETTAG25256 ];  then
 	cd at91bootstrap-3.7-arietta-256m
 	if [ ! -f .config ]; then
-		echo "$(date)   | - Create default configuration" >> ../../$LOG_FILE
+		addlog "- Create default configuration"
 		make arietta-256m_defconfig
 	fi
 fi
@@ -256,11 +269,11 @@ elif ([ $BOARD -eq $ARIAG25128 ] || [ $BOARD -eq $ARIAG25256 ]) && [ $KERNEL -eq
 	nano .config
 	SHA2=$(echo -n .config | sha256sum)
 	if [ "$SHA1" != "$SHA2" ]; then
-		echo "$(date)   | - Create new verson of bootloader" >> ../../$LOG_FILE
+		addlog "- Create new verson of bootloader"
 		make
-		echo "$(date)   |   - Creation ok." >> ../../$LOG_FILE
+		addlog "- Creation ok."
 	else
-		echo "$(date)   | - Booloader configuration has not changed" >> ../../$LOG_FILE
+		addlog "- Booloader configuration has not changed"
 	fi
 	echo
 elif [ $BOARD -eq $FOX ] && [ $KERNEL -eq $K2_6_38 ]; then
@@ -275,18 +288,18 @@ else
 	read_yn; EDIT=$POINTER
 	if [[ $EDIT =~ ^(y|Y)$ ]]; then
 		make menuconfig
-		echo "$(date)   | - Menu config was opened." >> ../../$LOG_FILE
+		addlog "- Menu config was opened."
 		SHA2=$(echo -n .config | sha256sum)
 		if [ "$SHA1" != "$SHA2" ]; then
-			echo "$(date)   |   - Bootloader configuration is not changed." >> ../../$LOG_FILE
-			echo "$(date)   |     - Compiling start" >> ../../$LOG_FILE
+			addlog "  - Bootloader configuration is not changed."
+			addlog "  - Compiling start"
 			make CROSS_COMPILE=arm-linux-gnueabi-
-			echo "$(date)   |     - Compiling end" >> ../../$LOG_FILE
+			addlog "  - Compiling end"
 		else
-			echo "$(date)   |   - But Configuration has not changed." >> ../../$LOG_FILE
+			addlog "  - But Configuration has not changed."
 		fi
 	else
-		echo "$(date)   |   - Bootloader configuration has not changed." >> ../../$LOG_FILE
+		addlog "- Bootloader configuration has not changed."
 	fi
 fi
 #exit from specific bootloader folder
@@ -310,7 +323,7 @@ function wrong {
 }
 
 function compilekernel {
-	echo "$(date)   | Kernel" >> $LOG_FILE
+	addlog "Kernel"
 
 	if   [ $KERNEL -eq $K4_2_6 ]; then
 		echo
@@ -318,7 +331,7 @@ function compilekernel {
 		echo "K E R N E L   4 . 2 . 6"
 		echo
 		echo
-		echo "$(date)   | - Version 4.2.6" >> $LOG_FILE
+		addlog "- Version 4.2.6"
 		cd kernel/linux-4.2.6
 	elif [ $KERNEL -eq $K4_1_11 ]; then
 		echo
@@ -326,7 +339,7 @@ function compilekernel {
 		echo "K E R N E L   4 . 1 . 1 1"
 		echo
 		echo
-		echo "$(date)   | - Version 4.1.11" >> $LOG_FILE
+		addlog "- Version 4.1.11"
 		cd kernel/linux-4.1.11
 	elif [ $KERNEL -eq $K3_18_14 ]; then
 		echo
@@ -334,7 +347,7 @@ function compilekernel {
 		echo "K E R N E L   3 . 1 8 . 1 4"
 		echo
 		echo
-		echo "$(date)   | - Version 3.18.14" >> $LOG_FILE
+		addlog "- Version 3.18.14"
 		cd kernel/linux-3.18.14
 	elif [ $KERNEL -eq $K3_16_1 ]; then
 		echo
@@ -342,7 +355,7 @@ function compilekernel {
 		echo "K E R N E L   3 . 1 6 . 1"
 		echo
 		echo
-		echo "$(date)   | - Version 3.16.1" >> $LOG_FILE
+		addlog "- Version 3.16.1"
 		cd kernel/linux-3.16.1
 	elif [ $KERNEL -eq $K3_10 ]; then
 		echo
@@ -350,7 +363,7 @@ function compilekernel {
 		echo "K E R N E L   3 . 1 0"
 		echo
 		echo
-		echo "$(date)   | - Version 3.10" >> $LOG_FILE
+		addlog "- Version 3.10"
 		cd kernel/linux-3.10
 	elif [ $KERNEL -eq $K2_6_39 ]; then
 		echo
@@ -358,7 +371,7 @@ function compilekernel {
 		echo "K E R N E L   2 . 6 . 3 9"
 		echo
 		echo
-		echo "$(date)   | - Version 2.6.39" >> $LOG_FILE
+		addlog "- Version 2.6.39"
 		cd kernel/linux-2.6.39
 	elif [ $KERNEL -eq $K2_6_38 ]; then
 		echo
@@ -366,7 +379,7 @@ function compilekernel {
 		echo "K E R N E L   2 . 6 . 3 8"
 		echo
 		echo
-		echo "$(date)   | - Version 2.6.38" >> $LOG_FILE
+		addlog "- Version 2.6.38"
 		cd kernel/foxg20-linux-2.6.38
 	else
 		wrong
@@ -377,7 +390,7 @@ function compilekernel {
 	echo
 	echo "Add files under git for safety"
 	echo
-	echo "$(date)   | - Add files under git for safety" >> ../../$LOG_FILE
+	addlog "- Add files under git for safety"
 	git add .
 	if [ -f .config ]; then
 		git add -f .config
@@ -401,21 +414,23 @@ function compilekernel {
 		echo
 		echo "Ok."
 		echo
+		#check if it is a number
+		checknumber $KERNEL_CONFIG
 		if [ $KERNEL_CONFIG -eq 1 ]; then
 			rm .config
-			echo "$(date)   | - Delete .config" >> ../../$LOG_FILE
+			addlog "- Delete .config"
 			make ARCH=arm mrproper
 		# 3 but if .config do not exist !!
 		elif [ $KERNEL_CONFIG -eq 3 ] && [ ! -f .config ]; then
 			echo
 			echo "But .config do not exist, no previous configuration found !"
 			echo
-			echo "$(date)   | - Keep previous kernel configuration but it do not exist. Exit" >> ../../$LOG_FILE
+			addlog "- Keep previous kernel configuration but it do not exist. Exit"
 			exit
 		elif [ $KERNEL_CONFIG -eq 3 ] && [ -f .config ]; then
-			echo "$(date)   | - Kernel built in the past" >> ../../$LOG_FILE
+			addlog "- Kernel built in the past"
 		elif [ $KERNEL_CONFIG -ne 2 ]; then
-			echo "$(date)   | - Wrong value ( $KERNEL_CONFIG ) in what to do about kernel configuration" >> ../../$LOG_FILE
+			addlog "- Wrong value ( $KERNEL_CONFIG ) in what to do about kernel configuration"
 			wrong
 		fi
 		CONFIG_DEF=0 # do not use default config file
@@ -426,7 +441,7 @@ function compilekernel {
 		echo
 		echo "Create default config file"
 		echo
-		echo "$(date)   | - Create default config file from Acme Systems defconfig" >> ../../$LOG_FILE
+		addlog "- Create default config file from Acme Systems defconfig"
 		if [ $BOARD -eq $ARIETTAG25128 ] || [ $BOARD -eq $ARIETTAG25256 ]; then
 			make ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- acme-arietta_defconfig
 		elif [ $BOARD -eq $ARIAG25128 ] || [ $BOARD -eq $ARIAG25256 ]; then
@@ -443,24 +458,24 @@ function compilekernel {
 	if [ $BOARD -eq $FOX ]; then
 		if [ $KERNEL_CONFIG -ne 3 ]; then
 			make menuconfig
-			echo "$(date)   | - Kernel menuconfig was opened" >> ../../$LOG_FILE
+			addlog "- Kernel menuconfig was opened"
 			sleep 1
-			echo "$(date)   | - Kernel compiling start" >> ../../$LOG_FILE
+			addlog "- Kernel compiling start"
 			make -j8
-			echo "$(date)   | - Kernel compiling end" >> ../../$LOG_FILE
+			addlog "- Kernel compiling end"
 			echo
 			echo
 			echo
-			echo "$(date)   | - Kernel modules compiling start" >> ../../$LOG_FILE
+			addlog "- Kernel modules compiling start"
 			make modules -j8
-			echo "$(date)   | - Kernel modules compiling end" >> ../../$LOG_FILE
+			addlog "- Kernel modules compiling end"
 			echo
 			echo
 			echo
 			rm -rf ./foxg20-modules # for safety
-			echo "$(date)   | - Kernel modules install start" >> ../../$LOG_FILE
+			addlog "- Kernel modules install start"
 			make modules_install
-			echo "$(date)   | - Kernel modules install end" >> ../../$LOG_FILE
+			addlog "- Kernel modules install end"
 		fi
 	else
 		if [ $KERNEL_CONFIG -ne 3 ]; then # 1 or 2
@@ -475,44 +490,44 @@ function compilekernel {
 			fi
 			if ([[ $KERNEL_MENU =~ ^(y|Y)$ ]] || [ $KERNEL_CONFIG -eq 2 ]); then
 				make ARCH=arm menuconfig
-				echo "$(date)   | - Kernel menu config was opened for change kernel configuration" >> ../../$LOG_FILE
+				addlog "- Kernel menu config was opened for change kernel configuration"
 			fi
 			SHA2=$(echo -n .config | sha256sum)
 			# if .config is changed or is created for first time
 			if [ "$SHA1" != "$SHA2" ] || [ $CONFIG_DEF -eq 1 ]; then
 				if [ "$SHA1" != "$SHA2" ]; then
-					echo "$(date)   |   - Kernel configuration was changed" >> ../../$LOG_FILE
+					addlog "  - Kernel configuration was changed"
 				else # SHA1 = SHA2  && $CONFIG_DEF = 1
 					echo
 					echo "Kernel configuration is not changed"
 					echo
-					echo "$(date)   |   - Kernel configuration is not changed" >> ../../$LOG_FILE
+					addlog "  - Kernel configuration is not changed"
 				fi
 				if [ $KERNEL_CONFIG -eq 2 ]; then
 					make ARCH=arm clean
-					echo "$(date)   |   - Clean generated files in kernel folder but keep kernel configuration (.config)" >> ../../$LOG_FILE
+					addlog "  - Clean generated files in kernel folder but keep kernel configuration (.config)"
 				fi
 				sleep 1
-				echo "$(date)   | - Kernel compiling start" >> ../../$LOG_FILE
+				addlog "- Kernel compiling start"
 				make -j8 ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- zImage
-				echo "$(date)   | - Kernel compiling end" >> ../../$LOG_FILE
+				addlog "- Kernel compiling end"
 				echo
 				echo
 				echo
-				echo "$(date)   | - Kernel modules compiling start" >> ../../$LOG_FILE
+				addlog "- Kernel modules compiling start"
 				make modules -j8 ARCH=arm CROSS_COMPILE=arm-linux-gnueabi-
-				echo "$(date)   | - Kernel modules compiling end" >> ../../$LOG_FILE
+				addlog "- Kernel modules compiling end"
 				echo
 				echo
 				echo
-				echo "$(date)   | - Kernel modules install start" >> ../../$LOG_FILE
+				addlog "- Kernel modules install start"
 				make modules_install INSTALL_MOD_PATH=./modules ARCH=arm
-				echo "$(date)   | - Kernel modules install end" >> ../../$LOG_FILE
+				addlog "- Kernel modules install end"
 			else
 				echo
 				echo "Kernel configuration is not changed"
 				echo
-				echo "$(date)   |   - But kernel configuration is not changed" >> ../../$LOG_FILE
+				addlog "  - But kernel configuration is not changed"
 			fi
 		fi
 	fi
@@ -540,9 +555,9 @@ function compilekernel {
 		make ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- acme-acqua.dtb
 	fi
 	if [[ $DTB_MOD =~ ^(y|Y)$ ]]; then
-		echo "$(date)   | - Editor for device tree was opened" >> ../../$LOG_FILE
+		addlog "- Editor for device tree was opened"
 	else
-		echo "$(date)   | - Device tree was not edited" >> ../../$LOG_FILE
+		addlog "- Device tree was not edited"
 	fi
 	echo
 	echo
@@ -612,10 +627,10 @@ function copyrootfs {
 	echo "Copy the root file system on the micro sd"
 	echo
 	echo
-	echo "$(date)   | Rootfs" >> $LOG_FILE
+	addlog "Rootfs"
 	sleep 1
-	if [ $KERNEL -eq $K2_6_38 ] || [ $KERNEL -eq $K2_6_39 ] || [ $KERNEL -eq $K3_10 ] || [ $KERNEL -eq $K3_16_1 ] || [ $KERNEL -eq $K3_18_14 ]; then
-		echo "$(date)   | - Rootfs with Debian Wheezy" >> $LOG_FILE
+	if [ $KERNEL -eq $K2_6_38 ] || [ $KERNEL -eq $K2_6_39 ] || [ $KERNEL -eq $K3_10 ] || [ $KERNEL -eq $K3_16_1 ] ||  [ $KERNEL -eq $K3_18_14 ]; then
+		addlog "- Rootfs with Debian Wheezy"
 		if [ $BOARD -eq $ACQUA256 ] || [ $BOARD -eq $ACQUA512 ]; then
 			sudo rsync -axHAX --progress rootfs/multistrap_debian_wheezy/acqua/target-rootfs/ /media/$USER/rootfs/
 		elif [ $BOARD -eq $ARIAG25128 ] || [ $BOARD -eq $ARIAG25256 ]; then
@@ -631,10 +646,10 @@ function copyrootfs {
 			echo
 			read_yn; USE_WHEEZY=$POINTER
 			if [[ $USE_WHEEZY =~ ^(y|Y)$ ]]; then
-				echo "$(date)   | - Rootfs with Debian Wheezy" >> $LOG_FILE
+				addlog "- Rootfs with Debian Wheezy"
 				sudo rsync -axHAX --progress rootfs/multistrap_debian_wheezy/acqua/target-rootfs/ /media/$USER/rootfs/
 			else
-				echo "$(date)   | - Rootfs with Debian Jessie" >> $LOG_FILE
+				addlog "- Rootfs with Debian Jessie"
 				sudo rsync -axHAX --progress rootfs/multistrap_debian_jessie/acqua/target-rootfs/ /media/$USER/rootfs/
 			fi
 		elif [ $BOARD -eq $ARIAG25128 ] || [ $BOARD -eq $ARIAG25256 ]; then
@@ -643,10 +658,10 @@ function copyrootfs {
 			echo
 			read_yn; USE_WHEEZY=$POINTER
 			if [[ $USE_WHEEZY =~ ^(y|Y)$ ]]; then
-				echo "$(date)   | - Rootfs with Debian Wheezy" >> $LOG_FILE
+				addlog "- Rootfs with Debian Wheezy"
 				sudo rsync -axHAX --progress rootfs/multistrap_debian_wheezy/aria/target-rootfs/ /media/$USER/rootfs/
 			else
-				echo "$(date)   | - Rootfs with Debian Jessie" >> $LOG_FILE
+				addlog "- Rootfs with Debian Jessie"
 				sudo rsync -axHAX --progress rootfs/multistrap_debian_jessie/aria/target-rootfs/ /media/$USER/rootfs/
 			fi
 		elif [ $BOARD -eq $ARIETTAG25128 ] || [ $BOARD -eq $ARIETTAG25256 ]; then
@@ -655,10 +670,10 @@ function copyrootfs {
 			echo
 			read_yn; USE_WHEEZY=$POINTER
 			if [[ $USE_WHEEZY =~ ^(y|Y)$ ]]; then
-				echo "$(date)   | - Rootfs with Debian Wheezy" >> $LOG_FILE
+				addlog "- Rootfs with Debian Wheezy"
 				sudo rsync -axHAX --progress rootfs/multistrap_debian_wheezy/arietta/target-rootfs/ /media/$USER/rootfs/
 			else
-				echo "$(date)   | - Rootfs with Debian Jessie" >> $LOG_FILE
+				addlog "- Rootfs with Debian Jessie"
 				sudo rsync -axHAX --progress rootfs/multistrap_debian_jessie/arietta/target-rootfs/ /media/$USER/rootfs/
 			fi
 		fi
