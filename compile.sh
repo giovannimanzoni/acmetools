@@ -478,11 +478,8 @@ function compilekernel {
 				echo "$(date)   | - Kernel menu config was opened for change kernel configuration" >> ../../$LOG_FILE
 			fi
 			SHA2=$(echo -n .config | sha256sum)
-			echo "qui"
 			# if .config is changed or is created for first time
-			if [ "$SHA1" != "$SHA2" ]; then
-			#|| [ $CONFIG_DEF -eq 1 ]
-			#then
+			if [ "$SHA1" != "$SHA2" ] || [ $CONFIG_DEF -eq 1 ]; then
 				if [ "$SHA1" != "$SHA2" ]; then
 					echo "$(date)   |   - Kernel configuration was changed" >> ../../$LOG_FILE
 				fi
@@ -507,6 +504,9 @@ function compilekernel {
 				make modules_install INSTALL_MOD_PATH=./modules ARCH=arm
 				echo "$(date)   |   - Kernel modules install end" >> ../../$LOG_FILE
 			else
+				echo
+				echo "Kernel configuration is not changed"
+				echo
 				echo "$(date)   |   - But kernel configuration is not changed" >> ../../$LOG_FILE
 			fi
 		fi
