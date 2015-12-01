@@ -278,24 +278,24 @@ elif ([ $BOARD -eq $ARIAG25128 ] || [ $BOARD -eq $ARIAG25256 ]) && [ $KERNEL -eq
 	echo "Please press any key to open shell editor"
 	read -n 1 KEY
 	echo
-	SHA1=$(echo -n .config | sha256sum)
+#	SHA1=$(NEW_SUM=`find .config  -print0| xargs -0 du -b --time  | sort -k4,4 | sha1sum | awk '{print $1}'`)
 	nano .config
-	SHA2=$(echo -n .config | sha256sum)
-	if [ "$SHA1" != "$SHA2" ]; then
-		addlog "- Create new verson of bootloader"
+#	SHA2=$(NEW_SUM=`find .config  -print0| xargs -0 du -b --time  | sort -k4,4 | sha1sum | awk '{print $1}'`)
+#	if [ "$SHA1" != "$SHA2" ]; then
+#		addlog "- Create new verson of bootloader"
 		make
-		addlog "- Creation ok."
-	else
-		addlog "- Booloader configuration has not changed"
-	fi
+#		addlog "- Creation ok."
+#	else
+#		addlog "- Booloader configuration has not changed"
+#	fi
 	echo
 elif [ $BOARD -eq $FOX ] && [ $KERNEL -eq $K2_6_38 ]; then
 	cd acmeboot
 	nano macaddress.txt
 else
 	#for all other
-	SHA1=$(echo -n .config | sha256sum)
-	SHA2=$SHA1
+#	SHA1=$(NEW_SUM=`find .config  -print0| xargs -0 du -b --time  | sort -k4,4 | sha1sum | awk '{print $1}'`)
+#	SHA2=$SHA1
 	echo
 	echo "Would you edit bootloader configuration ? y/n/Y/N"
 	echo
@@ -304,25 +304,24 @@ else
 	if [[ $EDIT =~ ^(y|Y)$ ]]; then
 		make menuconfig
 		addlog "- Menu config was opened."
-		SHA2=$(echo -n .config | sha256sum)
-		if [ "$SHA1" != "$SHA2" ]; then
-			addlog "  - Bootloader configuration is not changed."
-
-		else
-			addlog "  - But Configuration has not changed."
-		fi
-	else
-		addlog "- Bootloader configuration has not changed."
+#		SHA2=$(NEW_SUM=`find .config  -print0| xargs -0 du -b --time  | sort -k4,4 | sha1sum | awk '{print $1}'`)
+#		if [ "$SHA1" != "$SHA2" ]; then
+#			addlog "  - Bootloader configuration is not changed."
+#		else
+#			addlog "  - But Configuration has not changed."
+#		fi
+#	else
+#		addlog "- Bootloader configuration has not changed."
 	fi
 
-	if ([ "$SHA1" != "$SHA2" ] || [ $MAKEDEFCONFIG -eq 1 ]);then
+#	if ([ "$SHA1" != "$SHA2" ] || [ $MAKEDEFCONFIG -eq 1 ]);then
 		echo
 		echo "compile bootloader"
 		echo
 		addlog "  - Compiling start"
 		make CROSS_COMPILE=arm-linux-gnueabi-
 		addlog "  - Compiling end"
-	fi
+#	fi
 
 
 fi
@@ -519,7 +518,7 @@ function compilekernel {
 	else
 		if [ $KERNEL_CONFIG -ne 3 ]; then # 1 or 2
 
-			SHA1=$(echo -n .config | sha256sum)
+#	 		SHA1=$(NEW_SUM=`find .config  -print0| xargs -0 du -b --time  | sort -k4,4 | sha1sum | awk '{print $1}'`)
 			KERNEL_MENU=0
 			if [ $KERNEL_CONFIG -eq 1 ]; then
 				echo
@@ -528,20 +527,20 @@ function compilekernel {
 				read_yn; KERNEL_MENU=$POINTER
 			fi
 			if ([[ $KERNEL_MENU =~ ^(y|Y)$ ]] || [ $KERNEL_CONFIG -eq 2 ]); then
-				make ARCH=arm menuconfig
+				make ARCH=arm xconfig
 				addlog "- Kernel menu config was opened for change kernel configuration"
 			fi
-			SHA2=$(echo -n .config | sha256sum)
+#			SHA2=$(NEW_SUM=`find .config  -print0| xargs -0 du -b --time  | sort -k4,4 | sha1sum | awk '{print $1}'`)
 			# if .config is changed or is created for first time
-			if [ "$SHA1" != "$SHA2" ] || [ $CONFIG_DEF -eq 1 ]; then
-				if [ "$SHA1" != "$SHA2" ]; then
-					addlog "  - Kernel configuration was changed"
-				else # SHA1 = SHA2  && $CONFIG_DEF = 1
-					echo
-					echo "Kernel configuration is not changed"
-					echo
-					addlog "  - Kernel configuration is not changed"
-				fi
+#			if [ "$SHA1" != "$SHA2" ] || [ $CONFIG_DEF -eq 1 ]; then
+#				if [ "$SHA1" != "$SHA2" ]; then
+#					addlog "  - Kernel configuration was changed"
+#				else # SHA1 = SHA2  && $CONFIG_DEF = 1
+#					echo
+#					echo "Kernel configuration is not changed"
+#					echo
+#					addlog "  - Kernel configuration is not changed"
+#				fi
 				if [ $KERNEL_CONFIG -eq 2 ]; then
 					make ARCH=arm clean
 					addlog "  - Clean generated files in kernel folder but keep kernel configuration (.config)"
@@ -563,12 +562,12 @@ function compilekernel {
 				addlog "- Kernel modules install start"
 				make modules_install INSTALL_MOD_PATH=./modules ARCH=arm
 				addlog "- Kernel modules install end"
-			else
-				echo
-				echo "Kernel configuration is not changed"
-				echo
-				addlog "  - But kernel configuration is not changed"
-			fi
+#			else
+#				echo
+#				echo "Kernel configuration is not changed"
+#				echo
+#				addlog "  - But kernel configuration is not changed"
+#			fi
 		fi
 	fi
 
