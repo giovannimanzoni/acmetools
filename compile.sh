@@ -15,7 +15,7 @@
 WORKING_DIR=$(pwd)
 LOG_FILE='compile.log'
 POINTER= #function return values
-
+BOOTPARTITIONNAME= # boot or BOOT
 
 function addlog () {
 	echo "$(date)   | $1" >> $WORKING_DIR/$LOG_FILE
@@ -611,6 +611,17 @@ function copyfiles {
 	echo "visit  http://www.acmesystems.it/microsd_format  for how do it"
 	echo
 	read KEY
+	if [ -d /media/$USER/boot ];then
+		BOOTPARTITIONNAME='boot'
+	elif  [ -d /media/$USER/BOOT ];then
+		BOOTPARTITIONNAME='BOOT'
+	else
+		echo
+		echo "Boot partition not found"
+		echo
+		addlog "Boot partition not found"
+		exit
+	fi
 	copybootloader
 	copyrootfs
 	copykernel
@@ -624,17 +635,17 @@ function copybootloader {
 	echo
 	sleep 1
 	if [ $BOARD -eq $ACQUA256 ]; then
-		cp bootloader/at91bootstrap-3.7-acqua-256m/binaries/sama5d3_acqua-sdcardboot-linux-zimage-dt-3.7.bin /media/$USER/BOOT/boot.bin
+		cp bootloader/at91bootstrap-3.7-acqua-256m/binaries/sama5d3_acqua-sdcardboot-linux-zimage-dt-3.7.bin /media/$USER/$BOOTPARTITIONNAME/boot.bin
 	elif [ $BOARD -eq $ACQUA512 ]; then
-		cp bootloader/at91bootstrap-3.7-acqua-512m/binaries/sama5d3_acqua-sdcardboot-linux-zimage-dt-3.7.bin /media/$USER/BOOT/boot.bin
+		cp bootloader/at91bootstrap-3.7-acqua-512m/binaries/sama5d3_acqua-sdcardboot-linux-zimage-dt-3.7.bin /media/$USER/$BOOTPARTITIONNAME/boot.bin
 	elif [ $BOARD -eq $ARIAG25128 ]; then
-		cp bootloader/at91bootstrap-3.7-aria-128m/binaries/at91sam9x5_aria-sdcardboot-linux-zimage-dt-3.7.bin /media/$USER/BOOT/boot.bin
+		cp bootloader/at91bootstrap-3.7-aria-128m/binaries/at91sam9x5_aria-sdcardboot-linux-zimage-dt-3.7.bin /media/$USER/$BOOTPARTITIONNAME/boot.bin
 	elif [ $BOARD -eq $ARIAG25256 ]; then
-		cp bootloader/at91bootstrap-3.7-aria-256m/binaries/at91sam9x5_aria-sdcardboot-linux-zimage-dt-3.7.bin /media/$USER/BOOT/boot.bin
+		cp bootloader/at91bootstrap-3.7-aria-256m/binaries/at91sam9x5_aria-sdcardboot-linux-zimage-dt-3.7.bin /media/$USER/$BOOTPARTITIONNAME/boot.bin
 	elif [ $BOARD -eq $ARIETTAG25128 ]; then
-		cp bootloader/at91bootstrap-3.7-arietta-128m/binaries/at91sam9x5_arietta-sdcardboot-linux-zimage-dt-3.7.bin /media/$USER/BOOT/boot.bin
+		cp bootloader/at91bootstrap-3.7-arietta-128m/binaries/at91sam9x5_arietta-sdcardboot-linux-zimage-dt-3.7.bin /media/$USER/$BOOTPARTITIONNAME/boot.bin
 	elif [ $BOARD -eq $ARIETTAG25256 ]; then
-		cp bootloader/at91bootstrap-3.7-arietta-256m/binaries/at91sam9x5_arietta-sdcardboot-linux-zimage-dt-3.7.bin /media/$USER/BOOT/boot.bin
+		cp bootloader/at91bootstrap-3.7-arietta-256m/binaries/at91sam9x5_arietta-sdcardboot-linux-zimage-dt-3.7.bin /media/$USER/$BOOTPARTITIONNAME/boot.bin
 	elif [ $BOARD -eq $FOX ]; then
 		echo
 		echo "Leaving the FOX Board G20 off. Connect the FOX Board G20 debug port using the DPI adapter and check if the usbserial module driver for the DPI chip is correctly installed (typing dmesg in a second shell)"
@@ -744,29 +755,29 @@ function copykernel {
 	fi
 	if [ $KERNEL -eq $K4_1_11 ]; then
 		if [ $BOARD -eq $ACQUA256 ] || [ $BOARD -eq $ACQUA512 ]; then
-			cp arch/arm/boot/dts/acme-acqua-a5.dtb /media/$USER/BOOT/at91-sama5d3_acqua.dtb
-			cp arch/arm/boot/dts/acme-acqua-a5.dts /media/$USER/BOOT/at91-sama5d3_acqua.dts
+			cp arch/arm/boot/dts/acme-acqua-a5.dtb /media/$USER/$BOOTPARTITIONNAME/at91-sama5d3_acqua.dtb
+			cp arch/arm/boot/dts/acme-acqua-a5.dts /media/$USER/$BOOTPARTITIONNAME/at91-sama5d3_acqua.dts
 		elif [ $BOARD -eq $ARIAG25128 ] || [ $BOARD -eq $ARIAG25256 ]; then
-			cp arch/arm/boot/dts/acme-aria-g25.dtb /media/$USER/BOOT/at91-ariag25.dtb
-			cp arch/arm/boot/dts/acme-aria-g25.dts /media/$USER/BOOT/at91-ariag25.dts
+			cp arch/arm/boot/dts/acme-aria-g25.dtb /media/$USER/$BOOTPARTITIONNAME/at91-ariag25.dtb
+			cp arch/arm/boot/dts/acme-aria-g25.dts /media/$USER/$BOOTPARTITIONNAME/at91-ariag25.dts
 		elif [ $BOARD -eq $ARIETTAG25128 ] || [ $BOARD -eq $ARIETTAG25256 ]; then
-			cp arch/arm/boot/dts/acme-arietta-g25.dtb /media/$USER/BOOT/acme-arietta.dtb
-			cp arch/arm/boot/dts/acme-arietta-g25.dts /media/$USER/BOOT/acme-arietta.dts
+			cp arch/arm/boot/dts/acme-arietta-g25.dtb /media/$USER/$BOOTPARTITIONNAME/acme-arietta.dtb
+			cp arch/arm/boot/dts/acme-arietta-g25.dts /media/$USER/$BOOTPARTITIONNAME/acme-arietta.dts
 		fi
 	else
 		if [ $BOARD -eq $ACQUA256 ] || [ $BOARD -eq $ACQUA512 ]; then
-			cp arch/arm/boot/dts/acme-acqua.dtb /media/$USER/BOOT/at91-sama5d3_acqua.dtb
-			cp arch/arm/boot/dts/acme-acqua.dts /media/$USER/BOOT/at91-sama5d3_acqua.dts
+			cp arch/arm/boot/dts/acme-acqua.dtb /media/$USER/$BOOTPARTITIONNAME/at91-sama5d3_acqua.dtb
+			cp arch/arm/boot/dts/acme-acqua.dts /media/$USER/$BOOTPARTITIONNAME/at91-sama5d3_acqua.dts
 		elif [ $BOARD -eq $ARIAG25128 ] || [ $BOARD -eq $ARIAG25256 ]; then
-			cp arch/arm/boot/dts/acme-aria.dtb /media/$USER/BOOT/at91-ariag25.dtb
-			cp arch/arm/boot/dts/acme-aria.dts /media/$USER/BOOT/at91-ariag25.dts
+			cp arch/arm/boot/dts/acme-aria.dtb /media/$USER/$BOOTPARTITIONNAME/at91-ariag25.dtb
+			cp arch/arm/boot/dts/acme-aria.dts /media/$USER/$BOOTPARTITIONNAME/at91-ariag25.dts
 		elif [ $BOARD -eq $ARIETTAG25128 ] || [ $BOARD -eq $ARIETTAG25256 ]; then
-			cp arch/arm/boot/dts/acme-arietta.dtb /media/$USER/BOOT/acme-arietta.dtb
-			cp arch/arm/boot/dts/acme-arietta.dts /media/$USER/BOOT/acme-arietta.dts
+			cp arch/arm/boot/dts/acme-arietta.dtb /media/$USER/$BOOTPARTITIONNAME/acme-arietta.dtb
+			cp arch/arm/boot/dts/acme-arietta.dts /media/$USER/$BOOTPARTITIONNAME/acme-arietta.dts
 		fi
 	fi
-	cp arch/arm/boot/uImage /media/$USER/BOOT/image.bin #for at91bootloader configured for uImage
-	cp arch/arm/boot/zImage /media/$USER/BOOT
+	cp arch/arm/boot/uImage /media/$USER/$BOOTPARTITIONNAME/image.bin #for at91bootloader configured for uImage
+	cp arch/arm/boot/zImage /media/$USER/$BOOTPARTITIONNAME
 	sudo rsync -avc modules/lib/. /media/$USER/rootfs/lib/.
 	#exit from this kernel
 	cd ..
@@ -781,7 +792,7 @@ function umountmemory {
 	echo "sync files. . . Please wait"
 	echo
 	sync
-	sudo umount /media/$USER/BOOT
+	sudo umount /media/$USER/$BOOTPARTITIONNAME
 	sudo umount /media/$USER/rootfs
 	sudo umount /media/$USER/data
 	echo
