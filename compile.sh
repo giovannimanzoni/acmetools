@@ -888,6 +888,16 @@ if [ "$USER" == "root" ];then
 	echo
 	exit
 fi
+if [ ! -f /home/$USER/.gitconfig]; then
+	echo
+	echo "You have to configure git by do these commands:"
+	echo
+	echo 'git config --global user.email "your@email.com"'
+	echo 'git config --global user.name "your name"'
+	echo
+	exit
+fi
+
 menuboard
 menukernel
 validateb #validate bootloader
