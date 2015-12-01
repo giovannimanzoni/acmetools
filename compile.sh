@@ -883,6 +883,12 @@ function validateb () {
 # P R O G R A M
 #
 
+if [ "$USER" == "root" ];then
+	echo
+	echo "exit from root"
+	echo
+	exit
+fi
 menuboard
 menukernel
 validateb #validate bootloader
