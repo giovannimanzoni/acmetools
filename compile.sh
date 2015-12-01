@@ -66,7 +66,7 @@ echo "5: Arietta G25 128M"
 echo "6: Arietta G25 256M"
 echo "7: Fox G20"
 echo
-echo "log saved in $WORKING_DIR/$LOG_FILE"
+echo "log will be saved in $WORKING_DIR/$LOG_FILE"
 echo
 touch $WORKING_DIR/$LOG_FILE
 addlog "=============================="
@@ -202,6 +202,7 @@ sleep 1
 
 
 function compilebootloader {
+local MAKEDEFCONFIG=0
 echo
 echo
 echo "Bootloader section"
@@ -215,37 +216,49 @@ if [ $BOARD -eq $ACQUA256 ]; then
 	if [ ! -f .config ]; then
 		addlog "- Create default configuration"
 		make acqua-256m_defconfig
+		MAKEDEFCONFIG=1
 	fi
 elif [ $BOARD -eq $ACQUA512 ]; then
 	cd at91bootstrap-3.7-acqua-512m
 	if [ ! -f .config ]; then
 		addlog "- Create default configuration"
 		make acqua-512m_defconfig
+		MAKEDEFCONFIG=1
 	fi
 elif [ $BOARD -eq $ARIAG25128 ] && [ $KERNEL -ne $K2_6_39 ]; then
 	cd at91bootstrap-3.7-aria-128m
 	if [ ! -f .config ]; then
 		addlog "- Create default configuration"
 		make aria-128m_defconfig
+		MAKEDEFCONFIG=1
 	fi
 elif [ $BOARD -eq $ARIAG25256 ] && [ $KERNEL -ne $K2_6_39 ]; then
 	cd at91bootstrap-3.7-aria-256m
 	if [ ! -f .config ]; then
 		addlog "- Create default configuration"
 		make aria-256m_defconfig
+		MAKEDEFCONFIG=1
 	fi
 elif [ $BOARD -eq $ARIETTAG25128 ]; then
 	cd at91bootstrap-3.7-arietta-128m
 	if [ ! -f .config ]; then
 		addlog "- Create default configuration"
 		make arietta-128m_defconfig
+		MAKEDEFCONFIG=1
 	fi
 elif [ $BOARD -eq $ARIETTAG25256 ];  then
 	cd at91bootstrap-3.7-arietta-256m
 	if [ ! -f .config ]; then
 		addlog "- Create default configuration"
 		make arietta-256m_defconfig
+		MAKEDEFCONFIG=1
 	fi
+elif [ $BOARD -ne $FOX ];then
+	echo
+	echo "Board error"
+	echo
+	addlog "Board error"
+	exit
 fi
 
 #above and below if must be separated
@@ -282,25 +295,37 @@ elif [ $BOARD -eq $FOX ] && [ $KERNEL -eq $K2_6_38 ]; then
 else
 	#for all other
 	SHA1=$(echo -n .config | sha256sum)
+	SHA2=$SHA1
 	echo
 	echo "Would you edit bootloader configuration ? y/n/Y/N"
 	echo
 	read_yn; EDIT=$POINTER
+
 	if [[ $EDIT =~ ^(y|Y)$ ]]; then
 		make menuconfig
 		addlog "- Menu config was opened."
 		SHA2=$(echo -n .config | sha256sum)
 		if [ "$SHA1" != "$SHA2" ]; then
 			addlog "  - Bootloader configuration is not changed."
-			addlog "  - Compiling start"
-			make CROSS_COMPILE=arm-linux-gnueabi-
-			addlog "  - Compiling end"
+
 		else
 			addlog "  - But Configuration has not changed."
 		fi
 	else
 		addlog "- Bootloader configuration has not changed."
 	fi
+
+	echo "MAKEDEFCONFIG =  $MAKEDEFCONFIG"
+	if ([ "$SHA1" != "$SHA2" ] || [ $MAKEDEFCONFIG -eq 1 ]);then
+		echo
+		echo "compile bootloader"
+		echo
+		addlog "  - Compiling start"
+		make CROSS_COMPILE=arm-linux-gnueabi-
+		addlog "  - Compiling end"
+	fi
+
+
 fi
 #exit from specific bootloader folder
 cd ..
@@ -820,7 +845,6 @@ function validateb () {
 		fi
 	elif [ $BOARD -eq $ARIAG25128 ] && [ $KERNEL -ne $K2_6_38 ]; then
 		if [ ! -d  bootloader/at91bootstrap-3.7-aria-128m ]; then
-			echo "fallisce"
 			bootloadernotpresent
 		fi
 	elif [ $BOARD -eq $ARIAG25256 ]; then
