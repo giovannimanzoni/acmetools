@@ -315,7 +315,6 @@ else
 		addlog "- Bootloader configuration has not changed."
 	fi
 
-	echo "MAKEDEFCONFIG =  $MAKEDEFCONFIG"
 	if ([ "$SHA1" != "$SHA2" ] || [ $MAKEDEFCONFIG -eq 1 ]);then
 		echo
 		echo "compile bootloader"
@@ -801,8 +800,21 @@ function copykernel {
 			cp arch/arm/boot/dts/acme-arietta.dts /media/$USER/$BOOTPARTITIONNAME/acme-arietta.dts
 		fi
 	fi
-	cp arch/arm/boot/uImage /media/$USER/$BOOTPARTITIONNAME/image.bin #for at91bootloader configured for uImage
-	cp arch/arm/boot/zImage /media/$USER/$BOOTPARTITIONNAME
+
+	local IMGEXIST=0
+	if [ -f arch/arm/boot/uImage ];then
+		IMGEXIST=1
+		cp arch/arm/boot/uImage /media/$USER/$BOOTPARTITIONNAME/image.bin #for at91bootloader configured for uImage
+	fi
+	if [ -f arch/arm/boot/zImage ];then
+		IMGEXIST=1
+		cp arch/arm/boot/zImage /media/$USER/$BOOTPARTITIONNAME
+	fi
+	if [ $IMGEXIST -eq 0 ];then
+		echo "No kernel image found !"
+		addlog "No kernel image found !"
+		exit
+	fi
 	sudo rsync -avc modules/lib/. /media/$USER/rootfs/lib/.
 	#exit from this kernel
 	cd ..
