@@ -646,8 +646,8 @@ function copyfiles {
 		exit
 	fi
 	copybootloader
-	copyrootfs
 	copykernel
+	copyrootfs
 }
 
 function copybootloader {
@@ -814,6 +814,12 @@ function copykernel {
 		addlog "No kernel image found !"
 		exit
 	fi
+
+	echo
+	echo "Copy kernel lib for modules on micro SD"
+	echo
+	addlog "- Copy kernel lib for modules on micro SD"
+
 	sudo rsync -avc modules/lib/. /media/$USER/rootfs/lib/.
 	#exit from this kernel
 	cd ..
