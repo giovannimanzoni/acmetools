@@ -176,7 +176,7 @@ echo
 read -n 1 KEY
 echo "$(date)   | Setup package" >> $LOG_FILE
 sudo apt-get update
-sudo apt-get install libc6-armel-cross libc6-dev-armel-cross binutils-arm-linux-gnueabi libncurses5-dev beep gparted git multistrap qemu qemu-user-static binfmt-support dpkg-cross libqt4-dev qt4-qmake
+sudo apt-get install libc6-armel-cross libc6-dev-armel-cross binutils-arm-linux-gnueabi libncurses5-dev beep gparted git multistrap qemu qemu-user-static binfmt-support dpkg-cross libqt4-dev qt4-qmake unzip wget
 if  [[ $SETUPFORACQUA =~ ^(y|Y)$ ]]; then
 	sudo apt-get install gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf
 fi
