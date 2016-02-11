@@ -3,6 +3,7 @@
  *
  * by Manzoni Giovanni, thanks to all Linux comunity.
  *
+ * 11/02/2016 fix rs485 sections
  * 19/11/2015 this is not full version yet.
  */
  
@@ -186,10 +187,11 @@
 		                reg = <0xf8020000 0x4000>;
 				clocks = <&usart1_clk>;
                                 clock-names = "usart";
-				pinctrl-0 = <&pinctrl_usart1>;
+				pinctrl-0 = <&pinctrl_usart1 &pinctrl_usart1_rts &pinctrl_usart1_cts>;
 				pinctrl-names = "default";
 				linux,rs485-enabled-at-boot-time;
-				rs485-rts-delay = <0 20>; // or <0 0> ??
+				rs485-rts-delay = <0 20>; // or <0 0> // // <a b> a for start of packet, b end of packet in milliseconds
+				rs485-rts-active-high; // sets rts active high
 				interrupts = <6 IRQ_TYPE_LEVEL_HIGH 5>; // = <6 4 5> // 38.5.3 Interrupt Sources
 				dma-names = "tx", "rx";
 				atmel,use-dma-rx;
